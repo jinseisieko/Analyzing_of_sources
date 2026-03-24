@@ -1,0 +1,943 @@
+..Latest updates: hps://dl.acm.org/doi/10.1145/3664476.3670926 . .
+RESEARCH-ARTICLE
+Accuracy Evaluation of SBOM Tools for Web Applications and System-
+Level Soware
+ANDREAS HALBRITTER, Technical University of Applied Sciences Augsburg, Augsburg,
+Bayern, Germany .
+DOMINIK MERLI, Technical University of Applied Sciences Augsburg, Augsburg, Bayern,
+Germany . . .
+Open Access Support provided by: .
+Technical University of Applied Sciences Augsburg .
+PDF Download
+3664476.3670926.pdf
+23 March 2026
+Total Citations: 8
+Total Downloads: 2129 . .
+Published: 30 July 2024 . .
+Citation in BibTeX format . .
+ARES 2024: The 19th International
+Conference on Availability, Reliability
+and Security
+July 30 - August 2, 2024
+Vienna, Austria . .
+ARES '24: Proceedings of the 19th International Conference on Availability, Reliability and Security (July 2024)
+hps://doi.org/10.1145/3664476.3670926
+ISBN: 9798400717185
+.
+Accuracy Evaluation of SBOM Tools for Web Applications and
+System-Level Software
+Andreas Halbritter
+Augsburg Technical University of Applied Sciences
+Institute for Innovative Safety and Security
+Augsburg, Germany
+Andreas.Halbritter@tha.de
+Dominik Merli
+Augsburg Technical University of Applied Sciences
+Institute for Innovative Safety and Security
+Augsburg, Germany
+Dominik.Merli@tha.de
+ABSTRACT
+Recent vulnerabilities in software like Log4j raise the question
+whether the software supply chain is secured sufficiently. Govern-
+mental initiatives in the United States (US) and the European Union
+(EU) demand a Software Bill of Materials (SBOM) for solving this
+issue. An SBOM has to be produced by using creation tools and it
+has to be accurate and complete. In the past, there had been investi-
+gations in this field of research. However, no detailed investigation
+of several tools producing SBOMs has been conducted regarding ac-
+curacy and reliability. For this reason, we present a selection of four
+popular programming languages: Python, C, Rust and Typescript.
+For web application software we consider Python and Typescript
+while for system-level software C and Rust are investigated. They
+build the base for four sample software projects and their pack-
+age manager. For manual checking, the software projects are kept
+small with a small amount of packages and a single dependency.
+The open-source analysis tools are categorized as programming
+language dependent and general tools, and run in the standard
+execution mode on the software projects. The results were checked
+against completeness and the National Telecommunications and
+Information Administration (NTIA) minimum and recommended
+elements. There is no recommendation for a specific tool as no tool
+fulfills every requirement, only two tools can be recommended in
+a limited way. Many tools do not provide a complete SBOM, as
+they do not depict every test package and dependency. Govern-
+mental initiatives should define further specifications on SBOM for
+example regarding their accuracy and depth. Further research in
+this field, for example for proprietary tools or other programming
+languages is desirable.
+CCS CONCEPTS
+• Security and privacy → Software security engineering; Web
+application security; • Software and its engineering → Main-
+taining software; Software libraries and repositories; Software
+maintenance tools.
+This work is licensed under a Creative Commons Attribution-Share Alike
+International 4.0 License.
+ARES 2024, July 30–August 02, 2024, Vienna, Austria
+© 2024 Copyright held by the owner/author(s).
+ACM ISBN 979-8-4007-1718-5/24/07
+https://doi.org/10.1145/3664476.3670926
+KEYWORDS
+Software Security, Software Bill of Materials, Evaluation, Tool ac-
+curacy, Package manager, Python, C, Rust, Typescript
+ACM Reference Format:
+Andreas Halbritter and Dominik Merli. 2024. Accuracy Evaluation of SBOM
+Tools for Web Applications and System-Level Software. In The 19th Interna-
+tional Conference on Availability, Reliability and Security (ARES 2024), July
+30–August 02, 2024, Vienna, Austria. ACM, New York, NY, USA, 9 pages.
+https://doi.org/10.1145/3664476.3670926
+1 INTRODUCTION
+In September 2019 the Russian Intelligence Service gained access to
+US-American network management company Solarwinds based in
+Texas [ 7]. The attacker was able to insert code into the Solarwinds
+system and compromised the Solarwinds Orion software updates
+providing a backdoor. In December 2021 the Log4Shell vulnerability
+was discovered in the Apache Log4j library [ 5]. The Log4j library
+is an open-source logging library which is common in a lot of
+applications and is also existent as a dependency [ 4 ]. It was for
+example used in Java applications or Apache services like Flink or
+Swift. There were vulnerabilities including remote code execution
+or denial of service attacks being possible.
+In March 2024 a vulnerability was discovered in the xz library
+[ 25]. By compromising this library for example the SSH could be
+attacked indirectly. These examples show how important it is to
+secure the software supply chain.
+Two governmental initiatives have recognized the problem, such
+as the US-American Executive Order on Improving Nations Cyber-
+security [46]. This order was published in May 2021 and defined the
+duty to provide an SBOM by the manufacturer when a customer
+is buying a piece of software. The SBOM can also be provided as
+a download. Similar to the US the European Cyber Resilience Act
+which was published in 2022 also demands an SBOM for secur-
+ing the software supply chain [9 ]. Both initiatives strengthen the
+importance of using SBOM for vulnerability mitigation.
+SBOM offer different advantages for different users. SBOM may
+help developers to maintain their software in a fast and efficient
+way [43 ]. Purchasers of software may compare the SBOM with
+vulnerability databases for risk assessment. Whenever a software
+in productive use is affected by a vulnerability an SBOM may sim-
+plify the mitigation process. Governmental authorities may use
+SBOM for prevention for example if one company is affected by a
+vulnerability, they may warn other companies. Furthermore, it is
+possible to ensure vulnerability mitigation for old or deprecated
+components when an SBOM is available. Securing the software sup-
+ply chain is part of discussions in the academic community such as
+ARES 2024, July 30–August 02, 2024, Vienna, Austria Halbritter, Merli
+the contribution of Xia et al. It emphasizes that an essential aspect
+of an SBOM is the accuracy of the SBOM itself [ 49 ]. Stalnaker et al.
+support this point of view as they mention SBOM and its accuracy
+as important and describe the consequences of absence of accuracy
+[ 47 ]. Zahan et al. also propose the urgent need of accurate SBOM
+tools which are seemingly not present at the moment [ 50 ]. Enck
+and Williams also raise the question whether there can be confi-
+dence placed in SBOMs regarding their accuracy [45 ]. However,
+there are no investigations which deal with the question whether
+there are differences between the programming languages in gen-
+erating SBOM and whether the programming language dependent
+or general usable tools differ in producing an accurate SBOM.
+The contribution of this paper is the analysis of SBOM tools
+for different programming languages regarding their accuracy and
+other distinguishing characteristics. This enables a statement whether
+SBOM tools are reliable in general and which tool is suitable for
+which use case. The rest of the paper is structured as follows:
+Related work, background, methodology, results and evaluation,
+discussion and conclusion. The related work section represents the
+current state of the art and the scientific gap of SBOM research. The
+background section introduces necessary background knowledge,
+standards and data structures as well as the basics for the methodol-
+ogy section regarding the NTIA requirements. In the methodology
+section programming languages, formats, structure, the sample
+projects and the tools are described. Afterwards, it is presented
+how the tools are executed. The NTIA requirements build a base for
+the results and evaluation section where the tool output is checked
+against the completeness and the NTIA requirements. The results
+are graphically prepared in a results table. The discussion section
+shows the recommended tools and critically scrutinizes the results.
+In the conclusion section the investigation is summarized and future
+advice is given.
+2 RELATED WORK
+Arora et al. presented a guideline for choosing an SBOM tool accord-
+ing to particular criteria for users and researchers [41 ]. Additionally,
+they support the initial thesis that there are differences in program-
+ming languages for example libraries for Software Package Data
+Exchange (SPDX) which are only available in Python. Nevertheless,
+this publication tries to provide a framework for choosing the suit-
+able SBOM tool for a defined user set for example a manufacturer
+vs. a buyer. However, they did not consider the accuracy and the
+fulfillment of certain data fields of SBOM tools.
+Balliu et al. performed a study on the accuracy of six SBOM tools
+for Java [42 ]. The authors pointed out that there is an immediate
+need for investigating SBOM tools for doing fundamental research
+and inspected Java tools in Maven for generating SBOMs. Balliu et
+al. analysed GitHub projects with a score of 100 stars. Afterwards
+the authors described a self-created criteria scheme which was
+applied on a set of software projects and the results were filtered
+according to the predefined methodology. In the end, the authors
+motivate to investigate further programming languages and tools.
+As the motivation for the investigation is valid, some points remain
+unclear. The source of the criteria scheme and the methodology
+also persist ambiguous, the ground truth for the software projects
+is missing. The motivation for investigating further programming
+languages is valid and base for the following work. In this work we
+provide the ground truth by presenting the sample projects and the
+evaluation criteria, analyzing them transparently and presenting
+the results in human-readable design.
+Torres-Arias et al. did an investigation where they started a val-
+idation program checking the National Telecommunications and
+Information Administration predefined minimum elements of an
+SBOM to an SPDX SBOM collection on GitHub called Bom-shelter
+[48 ]. While the minimum elements of the NTIA build a valid ground
+for scientific research and the check of the SBOM tools regarding
+their fulfillment of the elements is valid, there is no differentiation
+between the programming languages and the programming lan-
+guage dependent and general tools. Furthermore, as the authors
+describe there may be inconsistencies when the ground truth is not
+assured. E.g. they mention an example where the NTIA checker pro-
+vided a false-positive result. Thus, it is important to assure ground
+truth in further investigations. Finally, the investigation is only
+based on SPDX SBOM and the standard CycloneDX is missing. The
+following work provides a differentiation between programming
+languages and a human-friendly design for checking the ground
+truth for false or missing entries. It is CycloneDX based for filling
+the gap of missing CycloneDX capabilities in Bom-shelter [48].
+3 BACKGROUND
+The following section describes necessary background information
+for SBOM. First, the standards of SBOM are listed. They are based on
+the NTIA minimum elements document. The structures of SBOM
+are presented in JSON and XML. Afterwards, the NTIA minimal
+SBOM requirements are introduced.
+3.1 Formats
+In the following section the common formats of SBOM according
+to NTIA are described more in detail.
+CycloneDX was developed in 2017 for the OWASP Dependency-
+Track vulnerability scanning tool [ 32 ]. It is designed for identifying
+vulnerabilities, licenses and deprecated components.
+SPDX is the second standard [ 36]. Version 1.0 was released in 2011,
+and it is designed to ensure security, license terms and securing the
+software supply chain. It is defined in ISO/IEC 5962:2021.
+Software Identification Tags (SWID) tags are defined in ISO/IEC
+19770-2:2015 [44 ]. They were defined for tracking software which
+is currently part of devices. SWID tags monitor the whole software
+lifecycle beginning in the installation phase and being deleted when
+the software is uninstalled.
+3.2 NTIA minimum requirements
+The following sections describe the minimum data fields defined
+by the NTIA. The NTIA defines the sections Supplier Name (SN),
+Component Name (CN), Version of the Component (VOC), Other
+Unique Identifiers (OUI), Dependency Relationship (DR), Author
+of the SBOM Data (AOSD) and Timestamp (TS) [6 ]. The NTIA
+minimum requirements were developed by involving stakeholders
+of the software industry and experts worldwide from 2018 until
+2021.
+Accuracy Evaluation of SBOM Tools for Web Applications and System-Level Software ARES 2024, July 30–August 02, 2024, Vienna, Austria
+Supplier Name is defined as origin of the software component
+Component Name describes name of the component, definition
+by supplier
+Version of the Component is the version identifier for differen-
+tiation from prior versions
+Other Unique Identifiers are identifiers which define a compo-
+nent, for example, a common platform enumeration (CPE), SWID
+and Package Uniform Resource Locators (PURL)
+Dependency Relationship defines the dependency of software
+components
+Author of the SBOM data is the metadata origin, for example,
+the manufacturer of the software or an analysis tool, not the author
+of the software.
+Timestamp defines the date and time when the SBOM is created.
+3.3 NTIA recommended SBOM data fields
+Furthermore the NTIA defines a recommended section for an SBOM.
+It includes: Hash of the component (HOC), Lifecycle phase (LP),
+Other component relationship (OCR) and License information (LI).
+Hash of the component is used for securing the software supply
+chain through component hashes.
+Lifecycle Phase describes when the SBOM was created, for ex-
+ample, while build or post build.
+Other component relationships are component relationships
+which are different to dependency, for example, similar origin of
+components.
+License information allows tracking licenses
+for decreasing legal threats.
+3.4 Further data fields
+The NTIA itself defines no section which deals with completeness.
+But the NTIA mentions that SBOMs may not be correct and have to
+be continuously improved. For covering this use case the data field
+completeness (C) is introduced additionally. It means that at least
+every package of the input packages is part of the SBOM output.
+Package manager or source code may contain more packages. This
+can also happen for example for metadata reasons, for providing
+source code or programming language dependent information in
+the SBOM. This is tolerated.
+4 METHODOLOGY
+For the experiment first the programming languages have to be
+defined. The assessed programming languages are part of web ap-
+plication and system-level software development. After that it is
+defined which SBOM format and which structure is part of the anal-
+ysis. As many SBOM tools are existent the quality has to be assured.
+In the following the sample software projects are introduced as well
+as the criteria for doing a transparent evaluation. Afterwards, the
+commands for running the tools are demonstrated, and the tools
+are executed.
+The following section describes the methodology of the per-
+formed tool analysis. It is structured as follows: Defining the pro-
+gramming languages, defining the standards of the SBOM, defin-
+ing the structure of the SBOM, providing a tool overview and an
+overview on the packages which are part of the investigation and
+finally the commands which were used to start the tools.
+4.1 SBOM format and structure
+As described in Section 3 CycloneDX is the younger standard, and
+it is primarily designed for securing the software supply chain,
+whereas SPDX has a wider scope and is the older standard. For the
+following investigation CycloneDX is choosen as standard under
+investigation. CycloneDX SBOMs are provided in JSON and in XML
+structure. As the focus of the paper is checking the tools against
+the NTIA criteria by hand, human readability is important. JSON is
+easier for readability and therefore chosen.
+4.2 Programming languages, tools and sample
+projects
+For the following experiment languages in web application develop-
+ment and system-level software are inspected. In web application
+Python and Typescript are part of the research and in system-level
+software Rust and C are investigated.
+For ensuring quality only official tools of the CycloneDX website
+are part of the investigation. As transparency is important for se-
+curing the software supply chain only open-source tools are part of
+the inspection. Additionally, we categorize the tools in general and
+programming language dependent tools, because not every single
+tool can work with every programming language. Furthermore, it
+is important to notice, that the tools which are under investigation
+have to work with software projects which are finished. E.g. tools
+which generate an SBOM in a pipeline are not part of the investiga-
+tion. Also tools which generate no SBOM like SBOM consuming
+vulnerability scanners are not part of the investigation. CycloneDX-
+Conan[11 ] an SBOM generation tool for C package manager Conan
+is replaced through the official CycloneDX-Conan-Extension as it
+is the successor of the deprecated CycloneDX-Conan.
+4.3 Overview of the tools under investigation
+The tools which are part of the investigation are presented in the
+following: Syft [40 ] and Cdxgen [16 ] are tools which can process
+multiple programming languages whereas the other tools are pro-
+gramming language dependent.
+Python Syft, Cdxgen, CycloneDX-Python [18],
+SBOM4Python [34]
+C Syft, Cdxgen, CycloneDX-Conan-Extension [14]
+Rust Syft, Cdxgen, SBOM4Rust [35]
+Typescript Syft, Cdxgen, CycloneDX-Npm [17], Covenant [15]
+4.3.1 General tools. In the following the tools of the investigation
+are introduced further regarding their version, maintainer, pro-
+gramming language, how the tools were started and their input
+data.
+Syft, version 0.90.0, is a community-driven SBOM tool. It is mainly
+based on Go and offers the possibility to generate SBOMs via
+command-line interface from container images and file systems. It
+is able to process multiple programming languages, for example
+Python, C, Rust and Typescript.
+Cdxgen, version 9.7.5, is mainly a Javascript-based tool which
+allows to create an SBOM command-line-based. Cdxgen can also
+work with all programming languages under investigation. SBOMs
+are generated for example via Requirements.txt (Python), Conan-
+file.txt (C), Cargo.toml and Cargo.lock (Rust) and Package-lock.json
+ARES 2024, July 30–August 02, 2024, Vienna, Austria Halbritter, Merli
+(Typescript). Furthermore, Cdxgen describes on its website that
+transitive dependencies are only supported by certain input data. In
+this investigation we focus on the dependencies according to NTIA
+definition, which means that the investigation checks whether Soft-
+ware A depends on B. We do not check whether A depends on B, B
+on C and therefore A depends on C. The direct dependency is not
+part of the Cdxgen documentation and therefore it is part of the
+investigation.
+4.3.2 Python specific tools.
+CycloneDX-Python, version 4.1.1, is a community-based and
+command-line-based tool mainly developed in Python program-
+ming language for generating SBOM which can work with a large
+amount of input data for example a Requirements.txt in Python
+projects.
+SBOM4Python, version 0.10.3, is a community developed command-
+line-based tool programmed in Python for generating an SBOM
+from Python projects. It works for example with a Requirements.txt
+as input data.
+4.3.3 C specific tools.
+CycloneDX-Conan-Extension, no version history available, is
+a community driven Python based Conan-Extension which allows
+the generation of SBOM from Conan-based projects. It is in experi-
+mental stage. Their is no input data specified.
+4.3.4 Rust specific tools.
+SBOM4Rust, version 0.4.1, is a Python based tool which allow the
+generation from Rust-based projects. It is developed by Anthony
+Harrison. There is no input file specified.
+4.3.5 Typescript specific tools.
+CycloneDX-Npm, version 1.14.3, is a Typescript-based and a
+Javascript-based tool which allows the generation of SBOMs for
+Npm projects. It requires a package manifest file for input, for
+example Packages.json.
+Covenant, version 0.16.0, is a C# and HTML based tool for gen-
+erating SBOM in Npm projects. It is developed by a community.
+There is no input data format specified.
+4.4 Sample Projects Setup and packages
+The sample projects were example projects with less code. For the
+investigation only the packages are relevant. The projects were set
+up via:
+Python
+python3 -m venv venv source /bin/activate
+C
+git clone https://github.com/conan-io/examples2.git
+cd examples2/tutorial/consuming_packages/simple_
+cmake_project
+conan install . --output-folder=build --build=missing
+Rust
+cargo new_hello_cargo
+Typescript
+npm init
+Only packages with zero dependencies were chosen, except one
+package with one dependency. The packages are installed via the
+package manager for example Pip, Conan, Cargo or Npm.
+Programming language Python
+Input data Attr [8 ], Click [ 13 ], Jinja2 [ 23 ], MarkupSafe [ 28 ], Petl
+[31], Pygments [33]
+Dependency relationship Jinja2 depends on MarkupSafe
+File containing data Requirements.txt
+Programming language C
+Input data Lz4 [ 27], Gtest [22 ], Sqlite3 [37 ] [ 38], Nlohmann_json
+[24], OpenSSL [30]
+Dependency relationship OpenSSL depends on zlib
+File containing data Conanfile.txt
+Programming language Rust
+Input data Doc-comment [ 3 ], Either [ 21], Num-traits [ 29 ], Lock
+[1], Strsim [39]
+Dependency relationship strsim depends on autocfg
+File containing data Cargo.toml, Cargo.lock
+Programming language Typescript
+Input data Chalk [ 10 ], Dotenv [ 19 ], Dotenv-expand [ 20 ], Is-empty-
+object [12], Left-pad [2], Lodash [26]
+Dependency relationship Dotenv-expand depends on Dotenv
+File containing data Package.json, Package-lock.json
+Packages with fewer dependencies were chosen to secure the
+ability of manual checking the SBOM. Additionally, in every exam-
+ple there is one package which has a single dependency for checking
+the dependencies in the SBOM. E.g. Jinja2, OpenSSL, Num-traits
+and Dotenv-expand. In some examples they are part of the file
+containing data, it depends on whether the package manager added
+the dependency or not.
+The packages which were part of the Python investigation are
+introduced in the following.
+4.4.1 Python.
+Attr is a decorator package which prevents the necessity of re-
+peating when setting attributes of distinguishing functions.
+Click defines a package which helps to increase the velocity when
+writing command-line applications.
+Jinja2 is a template engine. By using placeholders it is possible to
+write Python like code.
+MarkupSafe is a package which provides security by using a text
+object which prevents untrusted user input.
+Petl is used for retrieving, converting, and importing data table
+structures.
+Pygments is used for code highlighting.
+Requirements.txt is used for listing the pip installed packages.
+4.4.2 C.
+Lz4 is used for compressing data.
+Gtest is a framework provided by Google for testing C++ code.
+Sqlite3 is a database engine which runs without a server and
+provides further advantages like in-process use.
+Nlohmann_json is used for integrating JSON in C++ code.
+OpenSSL offers tools for encrypting connections.
+Accuracy Evaluation of SBOM Tools for Web Applications and System-Level Software ARES 2024, July 30–August 02, 2024, Vienna, Austria
+Conanfile.txt is used for simple projects. It is possible to use
+Conanfile.py for more complex ones and for gaining more flexibility.
+As this project is simple a conanfile.txt is used.
+4.4.3 Rust.
+Doc-comment is a package which enables the generation of doc
+comments on macro basis.
+Either is an enum data structure with two possible values.
+Num-traits package delivers standard mathematical functionality.
+Lock is used for preventing unauthorized access by locking the
+system.
+Strsim provides functions for similarity scoring in strings for
+example Hamming.
+Cargo.toml is necessary for adding packages and Cargo.lock
+Cargo.lock is automatically generated by Cargo. Both files are in
+use.
+4.4.4 Typescript.
+Chalk is used for graphically designing command-line text.
+Dotenv is used for information transfer from a .env file to a pro-
+cess.env
+Dotenv-expand increases the functionality of dotenv by doing
+variable expansion
+Is-empty-object inspects whether an object has properties or
+attributes
+Left-pad fills empty spaces until the desired string length is
+reached
+Lodash simplifies the handling of, for example arrays or values
+in Javascript
+4.5 Running the Tools
+The tools were run in their standard configuration. The following
+section shows the options how the tools were run.
+4.5.1 Python.
+Syft was run in the directory of the Requirements.txt, therefore
+"." is the starting point. The output format is CycloneDX JSON. The
+command is as follows:
+syft . -o cyclonedx-json=syft_conan.cyclonedX
+Cdxgen was run in the Requirements.txt directory. The output
+file is default JSON style and the CycloneDX format. The command
+for starting is:
+cdxgen -o cdxgen_conan.cycloneDX
+SBOM4Python requires a module name "main.py". The output
+format is CycloneDX and JSON style.
+sbom4python -m main.py --sbom cyclonedx --format json
+-o sbom4python_pip.cyclonedx
+CycloneDX-Python requires a reference on the input data for
+example a requirements file. The output format is CycloneDX and
+JSON style, it has to be manually put in a .cyclonedx file.
+cyclonedx-py requirements > cylonedx-pip.cyclonedx
+4.5.2 C.
+Syft was run in the directory of the conanfile.txt, therefore "."
+is the starting point. The output format is .cyclonedx JSON. The
+command is as follows:
+syft . -o cyclonedx-json=syft_conan.cyclonedx
+Cdxgen was run in the conanfile.txt directory. The output file is
+default JSON style and the CycloneDX format. The command for
+starting is:
+cdxgen -o cdxgen_conan.cyclonedx
+CycloneDX-Conan-Extension was run to provide an CycloneDX
+SBOM. The format is a necessary part of the command. 1.4 is the
+newest format (29th April 2024). The output has to be manually
+put in a .cyclonedx file. The following command was started:
+conan sbom:cyclonedx --format 1.4_json .
+> conan_sbom.cyclonedx
+4.5.3 Rust.
+Syft was run in the directory containing Cargo.toml and the
+Cargo.lock. The output file is JSON style and the CycloneDX format.
+The command for starting is:
+syft . -o CycloneDX-json=syft_conan.cyclonedx
+Cdxgen was run in the directory containing Cargo.toml and the
+Cargo.lock. The output file is default JSON style and the CycloneDX
+format. The command for starting is:
+cdxgen -o cdxgen_conan.cyclonedx
+SBOM4Rust requires an application and the main.rs file. The
+output is in CycloneDX JSON.
+sbom4Rust -a ./src/main.rs --sbom cyclonedx --format
+json -o sbom4Rust_cargo.cyclonedx
+4.5.4 Typescript.
+Syft was run in the directory containing Package-lock.json and
+the Package.json. The output file is default JSON style and the
+CycloneDX format. The command for starting is:
+syft . -o cyclonedx-json=syft_conan.cyclonedx
+Cdxgen was run in the directory containing Package-lock.json
+and the Package.json. The output file is default JSON style and the
+CycloneDX format. The command for starting is:
+cdxgen -o cdxgen_conan.cyclonedx
+CycloneDX-Npm was started in the folder containing the Package-
+lock.json and the Package.json file. The output format is CycloneDX,
+cyclonedx-npm --output-file CycloneDX_npm.cyclonedx
+Covenant was started in the folder containing the Package-lock.json
+and the Package.json file. The output format default is CycloneDX
+the default value for structure is JSON. As it requires .NET, the
+dotnet command is part of the run.
+dotnet covenant generate
+5 RESULTS AND EVALUATION
+The following section provides the results and evaluation according
+to the NTIA minimal requirements from Section 3.2. Every tool was
+started with the commands from Section 4.5. Table 1 represents the
+results of the investigation. The following information is included:
+Completeness (C), Supplier Name (SN), Component Name (CN),
+Version of the Component (VOC), Other Unique Identifiers (OUI),
+Dependency Relationship (DR), Author of the SBOM Data (AOSD),
+Timestamp (TS), Hash of the component (HOC), Lifecycle phase
+ARES 2024, July 30–August 02, 2024, Vienna, Austria Halbritter, Merli
+(LP), Other component relationship (OCR), License information
+(LI).
+If the criteria is present in the SBOM then there is a "+", if the
+criteria is not present then there is a "-". The criteria can be present
+but in another format for example an author information not being
+present in an "author:xxx" field then there is also a "o". If the criteria
+is partially fulfilled or not sufficiently fulfilled, for example empty
+data fields then there is also a "o". As the requirement focuses on
+accuracy of evaluation only "+" and "-" are counted.
+5.0.1 Python.
+Syft fullfills the completeness as defined in Section 3.2, no supplier
+is present and the components do have names. Moreover, every
+component has a version tag. As defined in Section 3.2 Syft uses
+CPE and PURL for OUI. A dependency relationship is not present.
+The author is present as "vendor=syft." As defined in the previous
+Section 4.4 the author is the source of the metadata and can be a
+third party analysis tool such as Syft. A timestamp is present.
+For the recommended arguments there is no HOC present, no LP
+is available, no OCR is present and no LI existing.
+Cdxgen fulfills the completeness, it has no supplier present, every
+single component is given a name and a version number. Cdxgen
+uses PURL for OUI and the test dependency mentioned in Section
+4.4 Jinja - MarkupSafe is present. The author is present. A timestamp
+is available.
+For the recommended section there is no HOC, LP and OCR avail-
+able. A LI field is existing but empty.
+Additionally, to the SBOM Cdxgen delivers a second file containing
+ObjectSlices and UserDefinedTypes. Both fields are empty. The rest
+of the document is empty.
+CycloneDX - Python fulfills the completeness, it has a supplier
+present not namely, but it references on the Pypi.org links to ev-
+ery single component. Every single component has a name and
+a version. CycloneDX-BOM CycloneDX-BOM uses PURL as OUI.
+A dependency relationship is present but not correct. The sample
+dependency is not present. The author of the metadata is present
+as the creating tool and the timestamp is available.
+It delivers some LI regarding the tool in form of GitHub links but
+not for components. The rest of the recommended section is not
+fulfilled.
+SBOM4Python does not fulfill completeness, SBOM4Python de-
+livers only a single component which is the tool itself. It delivers
+no SN, a CN, a VOC, no OUI and no DR. AOSD is available and the
+timestamp is also available.
+The recommended section is not fulfilled.
+5.0.2 C.
+Syft does not provide completeness, as Zlib is missing, it delivers
+no SN, every single component is given a name. A version of the
+component is available. Syft delivers CPE and PURL for OUI. A DR
+is not present. The author of the SBOM metadata and the TS are
+present.
+Syft delivers a hash for the Conanfile.txt, but not for further com-
+ponents. The recommended section is not fulfilled.
+Cdxgen does not provide completeness, an SN is not present, a
+CN is present. A VOC is also present. Cdxgen presents PURL as OUI.
+A DR is present but empty. AOSD is present and a TS is present
+too.
+Although there is a license field in the SBOM it is empty and no
+other fields of the recommended data are fulfilled.
+CycloneDX-Conan-Extension provides completeness, it deliv-
+ers some sort of SN for example GitHub links to the projects. CN
+are present, VOC and PURL as OUI too. The sample dependency
+relationship OpenSSL - Zlib is depicted correctly. The CycloneDX-
+Conan-Extension is present as author. A TS is available.
+The recommended data fields HOC, LP and OCR are not fulfilled.
+There is LI available for example Lz4 with the licenses "BSD-2-
+Clause" and "BSD-3-Clause."
+5.0.3 Rust.
+Syft provides the six test packages. An SN is not present, every
+component has its own name. A VOC is present. CPE and PURL are
+present as OUI. A DR is not available. AOSD and TS are present.
+The recommended section is not fulfilled.
+Cdxgen does not provide completeness, Strsim is missing. No SN
+is present, a CN is available, a VOC is available, OUI are available
+as PURL. The is DR present but empty, the AOSD and the TS are
+present.
+A HOC is available. Cdxgen delivers a SHA-384 checksum to every
+single component. LP and OCR are not available. A license section
+is provided but empty.
+Additionally to the SBOM Cdxgen delivers again a second file con-
+taining ObjectSlices and UserDefinedTypes. Both fields are empty.
+The rest of the document is empty.
+SBOM4Rust does provide completeness. An SN is not available.
+Every single component has a name and a version number. OUI are
+not present, the dependency relationship Num-traits - Autocfg is
+depicted correctly. AOSD and TS are present.
+The recommended section is not fulfilled.
+5.0.4 Typescript.
+Syft does provide completeness, an SN is not available, CN and
+VOC are present. PURL as OUI are available. A DR is not available,
+AOSD and TS are present.
+For the recommended section Syft delivers LI, for example a MIT
+license for the Is-empty-project component. Other recommended
+data fields are not existing.
+Cdxgen does provide completeness, an SN is not present, CN and
+VOC are present for every single component. PURL is present as
+OUI. The sample dependency Dotenv-expand - Dotenv is depicted
+correct. AOSD and TS are present.
+Cdxgen produces a SHA-512 checksum for every single component.
+A license field is present but empty. Other recommended data fields
+are not present.
+In addition to the SBOM Cdxgen delivers a second file containing
+ObjectSlices and UserDefinedTypes. Both fields are empty. The rest
+of the document is empty.
+CycloneDX-Npm does provide completeness, an SN is partially
+present, for example as GitHub links to the project, in some compo-
+nents even there are the exact author names present. CN and VOC
+Accuracy Evaluation of SBOM Tools for Web Applications and System-Level Software ARES 2024, July 30–August 02, 2024, Vienna, Austria
+Table 1: Comparison of Tools and their NTIA fulfillment
+Programming language Tool C SN CN VOC OUI DR AOSD TS HOC LP OCR LI
+Python Syft + - + + + - + + - - - -
+Cdxgen + - + + + + + + - - - o
+CycloneDX-Python + o + + + o + + - - - o
+SBOM4Python - - + + - - + + - - - -
+C Syft - - + + + - + + o - - -
+Cdxgen - - + + + o + + - - - o
+CycloneDX-Conan-Extension + o + + + + + + - - - +
+Rust Syft + - + + + - + + - - - -
+Cdxgen - - + + + o + + + - - o
+SBOM4Rust + - + + - + + + - - - -
+Typescript-npm Syft + - + + + - + + - - - +
+Cdxgen + - + + + + + + + - - o
+CycloneDX-Npm + o + + + + + + + - - +
+Covenant + - + + + o + + + - - +
+Present data field (+), Partially present data field (o) and not present data field (-)
+Completeness (C), Supplier Name (SN), Component Name (CN), Version of the Component (VOC), Other Unique Identifiers (OUI)
+Dependency Relationship (DR), Author of the SBOM Data (AOSD), Timestamp (TS), Hash of the component (HOC), Lifecycle phase (LP)
+Other component relationship (OCR), License information (LI)
+are present. There are PURL as OUI given. The DR Dotenv-expand
+- Dotenv is analysed correctly. The AOSD and TS are present.
+CycloneDX-Npm delivers a SHA-512 checksum for the compo-
+nents regarding their Tgz files from the Npmjs registry, a LP and a
+OCR is not present. Furthermore the tool provides LI of the compo-
+nents such as MIT license for the component Chalk.
+Covenant provides completeness, an SN is not present, CN and
+VOC are present. A PURL as OUI is present. A DR is present but
+not depicted completely, the sample dependency relationship is
+missing. AOSD and TS are present.
+Covenant provides a SHA-512 checksum for every component, no
+LP and no OCR is present. LI for the components, such as the MIT
+license for Chalk is present.
+6 DISCUSSION
+The analysis results indicate that there is no recognizable trend
+regarding the programming language dependent or general tools.
+E.g. in the Python section, Cdxgen fulfills most of the data, however
+in the C section, a programming language dependent tool produces
+the best matching output regarding the requirements. The investi-
+gated tools in Rust provide a mixed output and the CycloneDX-Npm
+tool gives the highest score of elements. Not all tools provide all
+packages, especially the dependency packages seem to cause diffi-
+culties, for example Syft and Cdxgen provide no complete SBOM in
+C, also SBOM4Python in Python and Cdxgen in Rust do no provide
+completeness. An incomplete SBOM may cause difficulties when
+doing vulnerability mitigation if a vulnerable component is not
+present in the SBOM. The dependency relationship is only depicted
+correctly by Cdxgen in Python, by CycloneDX-Conan-Extension in
+C, by SBOM4Rust in Rust and by Cdxgen and CycloneDX-Npm in
+Typescript. Depicting the dependencies is a central aspect of SBOM
+for mitigation reasons but also for purchasers. A purchaser might
+be interested in third party dependencies and their vulnerabilities
+which may affect his software ecosystem. Also supplier names that
+are not constantly available affect the mitigation process. A not
+present supplier can not be contacted for updates or bugfixes in
+case of vulnerabilities.
+CN and VN are present in every tool, OUI are present in most of
+the tools too. Only SBOM4Python and SBOM4Rust do not provide
+OUI. CN, VN and OUI are the core elements of an SBOM, if they
+are empty then the component can not be identified which may
+cause problems when vulnerability mitigation is necessary.
+Also, AOSD and TS are part of every result. If there are any
+elements missing in an SBOM e.g. when it is updated it is important
+to know the author and the timestamp of the SBOM.
+Some tools provide hashes and a few do provide LI. Hashes are
+for example provided by nearly every tool in the Typescript section
+and by Cdxgen in the Rust section. It may be suggested that some
+package manager do provide more information but it can no be
+proven. LI is only provided by CycloneDX-Conan-Extension in
+the C section and by CycloneDX-Npm, Covenant and Syft in the
+Typescript section. Again it is not recognizable why there are differ-
+ences between tools in the same programming languages. Hashes
+are similiar to the OUI an unique identifier which are important for
+identification of a component. LI may be important for developing
+reasons but in comparison to the previous SBOM information it
+is not that important for mitigation. The best tool for Python is
+Cdxgen as it provides seven of twelve data fields, especially it is
+the only tool which provides the DR.
+The best tool for C is CycloneDX-Conan-Extension it provides
+eight of twelve data fields. It provides almost the full minimal sec-
+tion of the NTIA data fields and also one data field of the recom-
+mended section. Overall it provides the second most data fields of
+ARES 2024, July 30–August 02, 2024, Vienna, Austria Halbritter, Merli
+the entire investigation.
+There is no best tool for Rust as every of the three tools provide
+six of twelve data fields. The DR is only provided by SBOM4Rust
+whereas an HOC is only provided by Cdxgen. Cdxgen does not
+provide completeness as a package which is a part of a dependency
+is missing.
+The best tool for Typescript is CycloneDX-Npm. It provides nine
+of twelve data fields, it fulfills the complete minimum NTIA section
+and two of four recommended sections. It is the overall tool which
+has provided the best results.
+The results also raise the question whether the input data is
+not of sufficient quality or the NTIA requirements currently are
+not an industrial standard even if they were developed by experts
+all over the world. Even if the NTIA requirements are partially
+fulfilled there is a high range between the granularity of the SBOM
+tools. Some tools provide additional information such as the type
+of the component. Also the versions of the CycloneDX standards
+vary. Some tools provide an CycloneDX standard in version 1.4 and
+some tools provide the newer standard in version 1.5. It may be the
+case that the tools under investigation are developed further and
+newer versions of tools may also support the newer format. Another
+reason for these differences may be the different data sources and
+the different package manager and their files. Also the starting
+point has influence on the result. It is important to start the tool in
+the correct directory with the files containing the information for
+SBOM generation. Moreover the files for the SBOM tools may have
+influence on the output. There also may be differences regarding
+the tools when they are developed further and newer versions are
+available. As the tools were started in their standard configuration
+there may be the possibility that certain tools may produce better
+results if they are started with more arguments. There may be the
+possibility that some package manager provide more data than
+others, but an interesting fact contradicts this, the combination
+between tools and programming language. E.g. Cdxgen provides
+eight of twelve data fields when applied to a Typescript package
+but only five when applied to a C package. The package manager
+in contrast delivers more information as the top tool in C provides
+eight of twelve data fields.
+As every tool under investigation is open-source it may be inter-
+esting to do a deep code analysis for investigating the differences
+between the tools.
+It may be possible that other tools may produce better results.
+For proving this is would be necessary to widen the search radius to
+tools which are not part of the official CycloneDX website but also
+other common open-source tools. Part of the current investigation
+were only open-source tools. It can not be determined whether
+proprietary tools may perform better or worse in generating SBOMs.
+This may be part of future research.
+As there are differences between programming languages it may
+be interesting to see whether the tools of the current investigat-
+tion or other tools perform better if applied to other programming
+languages and their package manager.
+Also part of the current investigation was creating the SBOM
+when the software is built. It may be possible that different SBOMs
+are produced when they are generated during different development
+stages for example while build time to get a better SBOM quality.
+7 CONCLUSION
+Picking up the initial thesis there may be only a limited recom-
+mendation for a specific SBOM tool given, as CycloneDX-Conan-
+Extension and CycloneDX-Npm nearly fulfill the minimal NTIA
+requirements and provide completeness but the recommended sec-
+tion is not sufficiently fulfilled. For other programming languages
+like Python and Rust there may be a limited recommendation given,
+users should focus on the tools which provide completeness and
+where no packages are missing.
+Especially the fact that packages or dependencies are missing in
+some tools require at least an additional check for example from a
+human, which can not be assured when the SBOM is bigger than a
+human readable size.
+As the governmental initiatives in the US and the EU try to
+provide an increasing level of IT-security this may be difficult to
+assure when the tools provide an unsufficient output. For fulfilling
+the governmental specifications there is a high demand for SBOM
+tools which provide an excellent level of trust. According to the
+previous investigations this is currently not present. The presented
+tools are only reliable in a limited manner.
+It is also questionable whether the US or the EU governmental
+initiatives go far enough as they only require an SBOM.
+As the previous investigation has shown an SBOM has many
+facets. An SBOM may be incomplete, the depth of the SBOM pro-
+duced from the previous investigation is not consistent and even
+the standards and versions in this small experiment vary. The idea
+of an SBOM for IT-security may be worsened by this.
+It would be desirable that governmental initiatives also require
+an correct SBOM of a certain depth, this may improve the quality
+of SBOM tools available on the market
+ACKNOWLEDGMENTS
+This research is partially funded by dtec.bw – Digitalization and
+Technology Research Center of the Bundeswehr. dtec.bw is funded
+by the European Union – NextGenerationEU (project “Digital Sensor-
+2-Cloud Campus Platform” (DS2CCP). This research is partially
+funded by the CARE REGIO project, funded by the Bavarian State
+Ministry of Health, Care and Prevention under grant number MGP-
+2101-0004.
+Accuracy Evaluation of SBOM Tools for Web Applications and System-Level Software ARES 2024, July 30–August 02, 2024, Vienna, Austria
+REFERENCES
+[1] 2017. lock. Retrieved 2024-05-10 from https://github.com/canova/lock-rs
+[2] 2019. left-pad. Retrieved 2024-05-10 from https://github.com/left-pad/left-pad
+[3] 2020. doc-comment. Retrieved 2024-05-10 from https://github.com/
+GuillaumeGomez/doc-comment
+[4] 2021. Alert Apache Log4j vulnerabilities. Retrieved 2024-05-10 from https:
+//www.ncsc.gov.uk/news/apache-log4j-vulnerability
+[5] 2021. Critical vulnerability in Java library Log4j. Retrieved 2024-
+05-10 from https://www.bsi.bund.de/EN/Themen/Unternehmen-und-
+Organisationen/Informationen-und-Empfehlungen/Empfehlungen-nach-
+Angriffszielen/Webanwendungen/log4j/log4j.html?nn=1010576
+[6] 2021. sbom minimum elements report. Retrieved 2024-05-01 from https://www.
+ntia.doc.gov/files/ntia/publications/sbom_minimum_elements_report.pdf
+[7] 2021. SolarWinds Cyberattack Demands Significant Federal and Private-
+Sector Response (infographic) | U.S. GAO. Retrieved 2024-05-10
+from https://www.gao.gov/blog/solarwinds-cyberattack-demands-significant-
+federal-and-private-sector-response-infographic
+[8] 2022. attr: Simple decorator to set attributes of target function or class in a DRY
+way. Retrieved 2024-05-09 from https://github.com/denis-ryzhkov/attr
+[9] 2022. Cyber Resilience Act. Retrieved 2023-08-30 from https:
+//eur-lex.europa.eu/resource.html?uri=cellar:864f472b-34e9-11ed-9c68-
+01aa75ed71a1.0020.02/DOC_1&format=PDF
+[10] 2023. chalk. Retrieved 2024-05-10 from https://github.com/chalk/chalk
+[11] 2023. CycloneDX/cyclonedx-conan. Retrieved 2024-05-10 from https://github.
+com/CycloneDX/cyclonedx-conan
+[12] 2023. is-empty-obj. Retrieved 2024-05-10 from https://github.com/IonicaBizau/is-
+empty-obj
+[13] 2024. click: Composable command line interface toolkit. Retrieved 2024-05-10
+from https://github.com/pallets/click
+[14] 2024. conan-io/conan-extensions. Retrieved 2024-05-09 from https://github.
+com/conan-io/conan-extensions/tree/main/extensions/commands/sbom
+[15] 2024. Covenant. Retrieved 2024-05-10 from https://github.com/patriksvensson/
+covenant
+[16] 2024. CycloneDX/cdxgen. Retrieved 2024-05-10 from https://github.com/
+CycloneDX/cdxgen
+[17] 2024. CycloneDX/cyclonedx-node-npm. Retrieved 2024-05-10 from https:
+//github.com/CycloneDX/cyclonedx-node-npm
+[18] 2024. CycloneDX/cyclonedx-python. Retrieved 2024-05-10 from https://github.
+com/CycloneDX/cyclonedx-python
+[19] 2024. dotenv. Retrieved 2024-05-10 from https://github.com/motdotla/dotenv
+[20] 2024. dotenv-expand. Retrieved 2024-05-10 from https://github.com/motdotla/
+dotenv-expand#readme
+[21] 2024. either. Retrieved 2024-05-10 from https://github.com/rayon-rs/either
+[22] 2024. googletest. Retrieved 2024-05-10 from https://github.com/google/
+googletest
+[23] 2024. Jinja2. Retrieved 2024-05-10 from https://github.com/pallets/jinja/
+[24] 2024. JSON for Modern C++. Retrieved 2024-05-10 from https://github.com/
+nlohmann/json
+[25] 2024. Kritische Backdoor in XZ für Linux. Retrieved 2024-05-
+01 from https://www.bsi.bund.de/SharedDocs/Cybersicherheitswarnungen/DE/
+2024/2024-223608-1032.pdf?__blob=publicationFile&v=5
+[26] 2024. lodash. Retrieved 2024-05-10 from https://github.com/lodash/lodash
+[27] 2024. lz4. Retrieved 2024-05-10 from https://github.com/lz4/lz4
+[28] 2024. MarkupSafe: Safely add untrusted strings to HTML/XML markup. Re-
+trieved 2024-05-10 from https://github.com/pallets/markupsafe
+[29] 2024. num-traits. Retrieved 2024-05-10 from https://github.com/rust-num/num-
+traits
+[30] 2024. OpenSSL. Retrieved 2024-05-10 from https://github.com/openssl/openssl
+[31] 2024. petl. Retrieved 2024-05-10 from https://github.com/petl-developers/petl
+[32] 2024. Project History CycloneDX. Retrieved 2024-05-10 from https://cyclonedx.
+org/about/history/
+[33] 2024. Pygments: Pygments is a syntax highlighting package written in Python.
+Retrieved 2024-05-10 from https://github.com/pygments/pygments
+[34] 2024. sbom4python. Retrieved 2024-05-10 from https://github.com/
+anthonyharrison/sbom4python
+[35] 2024. sbom4rust. Retrieved 2024-05-09 from https://github.com/
+anthonyharrison/sbom4rust
+[36] 2024. SPDX – Linux Foundation Projects Site. Retrieved 2024-05-10 from
+https://spdx.dev/about/overview/
+[37] 2024. Sqlite3. Retrieved 2024-05-10 from https://github.com/conan-io/conan-
+center-index/tree/master/recipes/sqlite3
+[38] 2024. Sqlite3. Retrieved 2024-05-10 from https://www.sqlite.org/about.html
+[39] 2024. strsim. Retrieved 2024-05-10 from https://github.com/rapidfuzz/strsim-rs
+[40] 2024. Syft. Retrieved 2024-05-10 from https://github.com/anchore/syft
+[41] Arushi Arora, Virginia Wright, and Christina Garman. 2022. Strengthening the
+Security of Operational Technology: Understanding Contemporary Bill of Materi-
+als. Journal of Critical Infrastructure Policy 3, 1 (2022), 111–135. https://doi.org/10.
+18278/jcip.3.1.8 arXiv:https://onlinelibrary.wiley.com/doi/pdf/10.18278/jcip.3.1.8
+[42] Musard Balliu, Benoit Baudry, Sofia Bobadilla, Mathias Ekstedt, Martin Monper-
+rus, Javier Ron, Aman Sharma, Gabriel Skoglund, César Soto-Valero, and Martin
+Wittlinger. 2023. Challenges of Producing Software Bill of Materials for Java. IEEE
+Security Privacy 21, 6 (2023), 12–23. https://doi.org/10.1109/MSEC.2023.3302956
+[43] Seth Carmody, Andrea Coravos, Ginny Fahs, Audra Hatch, Janine Medina, Beau
+Woods, and Joshua Corman. 2021. Building resilient medical technology supply
+chains with a software bill of materials. npj Digital Medicine 4, 1 (2021), 1–6.
+[44] Chris Clark, Robin Gandhi, Christopher Gates, Art Manion, Bob Martin,
+Chandan Nandakumaraiah, Brendan O’Connor, Kate Stewart, JC Herz, Tim
+Walsh, David Waltermire, and Steve Springett. 2019. ntia sbom formats
+and standards whitepaper - version 20191025. Retrieved 2024-05-
+01 from https://www.ntia.gov/files/ntia/publications/ntia_sbom_formats_and_
+standards_whitepaper_-_version_20191025.pdf
+[45] William Enck and Laurie Williams. 2022. Top Five Challenges in Software Supply
+Chain Security: Observations From 30 Industry and Government Organizations.
+IEEE Security Privacy 20, 2 (2022), 96–100. https://doi.org/10.1109/MSEC.2022.
+3142338
+[46] Joseph R. Biden Jr. 2021. Executive Order on Improving the Nation’s Cyber-
+security. Retrieved 2024-05-10 from https://www.whitehouse.gov/briefing-
+room/presidential-actions/2021/05/12/executive-order-on-improving-the-
+nations-cybersecurity/
+[47] Trevor Stalnaker, Nathan Wintersgill, Oscar Chaparro, Massimiliano Di Penta,
+Daniel M German, and Denys Poshyvanyk. 2024. BOMs Away! Inside the Minds
+of Stakeholders: A Comprehensive Study of Bills of Materials for Software Sys-
+tems. In Proceedings of the IEEE/ACM 46th International Conference on Software
+Engineering (ICSE ’24). Association for Computing Machinery, New York, NY,
+USA, Article 44, 13 pages. https://doi.org/10.1145/3597503.3623347
+[48] Santiago Torres-Arias, Dan Geer, and John Speed Meyers. 2023. A Viewpoint
+on Knowing Software: Bill of Materials Quality When You See It. IEEE Security
+Privacy 21, 6 (2023), 50–54. https://doi.org/10.1109/MSEC.2023.3315887
+[49] Boming Xia, Tingting Bi, Zhenchang Xing, Qinghua Lu, and Liming Zhu. 2023.
+An Empirical Study on Software Bill of Materials: Where We Stand and the Road
+Ahead. In 2023 IEEE/ACM 45th International Conference on Software Engineering
+(ICSE). 2630–2642. https://doi.org/10.1109/ICSE48619.2023.00219
+[50] Nusrat Zahan, Elizabeth Lin, Mahzabin Tamanna, William Enck, and Laurie
+Williams. 2023. Software Bills of Materials Are Required. Are We There Yet? IEEE
+Security Privacy 21, 2 (2023), 82–88. https://doi.org/10.1109/MSEC.2023.3237100

@@ -1,0 +1,1322 @@
+An Empirical Study on Software Bill of Materials:
+Where We Stand and the Road Ahead
+Boming Xia∗† , Tingting Bi∗‡ , Zhenchang Xing∗§ , Qinghua Lu∗† , Liming Zhu∗†
+∗CSIRO’s Data61, Sydney, Australia
+†University of New South Wales, Sydney, Australia
+‡Monash University, Melbourne, Australia
+§Australian National University, Canberra, Australia
+Abstract—The rapid growth of software supply chain attacks
+has attracted considerable attention to software bill of materials
+(SBOM). SBOMs are a crucial building block to ensure the trans-
+parency of software supply chains that helps improve software
+supply chain security. Although there are significant efforts from
+academia and industry to facilitate SBOM development, it is
+still unclear how practitioners perceive SBOMs and what are the
+challenges of adopting SBOMs in practice. Furthermore, existing
+SBOM-related studies tend to be ad-hoc and lack software
+engineering focuses. To bridge this gap, we conducted the first
+empirical study to interview and survey SBOM practitioners. We
+applied a mixed qualitative and quantitative method for gathering
+data from 17 interviewees and 65 survey respondents from 15
+countries across five continents to understand how practitioners
+perceive the SBOM field. We summarized 26 statements and
+grouped them into three topics on SBOM’s states of practice.
+Based on the study results, we derived a goal model and
+highlighted future directions where practitioners can put in their
+effort.
+Index Terms—software bill of materials, SBOM, bill of mate-
+rials, responsible AI, empirical study
+I. I NTRODUCTION
+Modern software products are assembled through intricate
+and dynamic supply chains [1], while recent attacks against
+software supply chains (SSC) have increased significantly
+(e.g., SolarWinds attack [2]). According to Sonatype’s report
+[3], there was a 650% year-over-year increase in SSC attacks
+in 2021, and the number was 430% in 2020. SSC attacks
+mainly aim at the upstream open source software/components
+(OSS) [4], yet OSS is heavily relied upon in software de-
+velopment [5]. The reliance on OSS leads to additional risks,
+such as the lack of reliable maintenance and support compared
+to proprietary software/components [6]. The security risks of
+software and its supply chain call for improved visibility into
+the SSC, with which timely and accurate identification of the
+impacted software/components could be carried out in case of
+a vulnerability or an SSC attack.
+A software bill of materials (SBOM) is a formal machine-
+readable inventory of the components (and their dependency
+relationships) used for producing a software product [7].
+SBOMs enhance the security of both the proprietary and
+open source components in SSCs [8] through improved trans-
+parency. According to Linux Foundation’s SBOM and Cyber-
+security Readiness report (SBOM readiness report for short)
+[5], SBOMs are critical for enhancing SSC security. 90%
+of the surveyed organizations have started or are planning
+their SBOM journey, with 54% already addressing SBOMs.
+The report also estimated 66% and 13% growth in SBOM
+production or consumption in 2022 and 2023, respectively.
+Nonetheless, some organizations are still concerned about how
+SBOM adoption and application will evolve (e.g., 40% are
+uncertain about industrial SBOM commitment and 39% seek
+consensus on SBOM data fields).
+Despite SBOMs’ essentiality for software and SSC security,
+there remain questions to answer and problems to solve.
+Motivated by the value of SBOMs and the existing gaps, with
+the overarching goal of investigating the SBOM status quo
+from practitioners’ perspectives, this paper aims to answer the
+following research questions (RQs).
+RQ1: What is the current state of SBOM practice?
+Despite the benefits of SBOMs and the SBOM readiness
+report showing an overall 90% of SBOM readiness, how
+practitioners perceive SBOMs and how SBOMs are being
+addressed in practice needs further investigation. To answer
+this question, we analyzed the SBOM practice status from
+SBOM generation, distribution and sharing, validation and
+verification, and vulnerability and exploitability management.
+We summarized the current SBOM practices and what practi-
+tioners expect.
+RQ2: What is the current state of SBOM tooling
+support?
+Despite the proliferation of the SBOM tooling market, this
+RQ focuses on the SBOM tooling status from the practition-
+ers’ perspective. We investigated the practitioners’ attitudes
+towards existing tools from the following aspects: the ne-
+cessity/availability/usability/integrity of SBOM tools. While
+exploring the current SBOM tooling state, we also looked into
+practitioners’ expectations of SBOM tools.
+RQ3: What are the main concerns for SBOM?
+This RQ investigates the most outstanding concerns SBOM
+practitioners have. Although the prospect of SBOMs is promis-
+ing, there are still challenges to resolve. With this RQ, we aim
+to provide a reference for the most imminent issues for future
+research and development on SBOMs.
+Our research aims to unveil the state of the SBOM field,
+investigating what practitioners have and how they are ad-
+dressing SBOMs, versus what they expect. Our work on
+2630
+2023 IEEE/ACM 45th International Conference on Software Engineering (ICSE)
+1558-1225/23/$31.00 ©2023 IEEE
+DOI 10.1109/ICSE48619.2023.00219
+2023 IEEE/ACM 45th International Conference on Software Engineering (ICSE) | 978-1-6654-5701-9/23/$31.00 ©2023 IEEE | DOI: 10.1109/ICSE48619.2023.00219
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+SBOMs has four main distinctions and contributions compared
+to existing work represented by the SBOM readiness report:
+1) Timeliness: The SBOM readiness report was published
+in January 2022, with the survey launched in June 2021.
+Google Trends shows a significant increase in SBOM
+interest since July 2021. This study provides a more
+updated view of SBOMs.
+2) Software engineering (SE) angles: The SBOM readi-
+ness report is industry-oriented and security-focused,
+whereas this research broadens and deepens the report
+and supplements SE angles, evidenced by considerations
+such as SBOM generation/update throughout software
+development lifecycle (Finding 5) and AIBOM (Section
+IV-A8). The detailed comparison between this research
+and the SBOM readiness report is presented in Table IV.
+3) Different objectives: The SBOM readiness report aims
+to investigate whether and to what extent organizations
+are prepared for SBOM production and consumption
+(i.e., readiness). In contrast, this study focuses on current
+SBOM practices and expectations from practitioners’
+perspectives. We provide a set of implications, including
+a goal model, for future endeavors towards further
+operationalizing SBOMs.
+4) Systematic methodology: We conducted the first em-
+pirical study on the SBOM status from practitioners’
+perspectives, using a mixed methodology. Instead of
+using predefined questions as in SBOM readiness re-
+port, we qualitatively and quantitatively coded in-depth
+opinions from 17 interviewees into 26 representative
+statements, which were validated in a survey with 65
+valid respondents from 15 countries.
+The remainder of this paper is organized as follows. Section
+II describes the context of the SBOM field. Section III presents
+the methodology of our study. In section IV we present the
+study results. Section V discusses the implications of this
+study. Section VI discusses related work, and section VII
+draws conclusions and outlines avenues for future work.
+II. B ACKGROUND : W HAT IS SBOM?
+A bill of materials (BOM) was initially used in the manu-
+facturing industry as an inventory list of all the sub-assemblies
+and components in a parent assembly [9]. Sharing the same
+origin, an SBOM as the building block to enhanced software
+supply chain security is a software “BOM” (see Fig. 1).
+There are three main SBOM standard formats: a) Software
+Package Data eXchange (SPDX), b) CycloneDX, and c)
+Software Identification (SWID) Tagging, while the first two
+are most adopted [11]. SPDX is an open-source international
+standard hosted by the Linux Foundation, emphasizing licence
+compliance. CycloneDX was designed by OWASP in 2017
+whose primary focus is security. SWID Tagging is also an in-
+ternational standard maintained by the US National Institute of
+Standards and Technology, focusing on providing a transparent
+software/components identification mechanism.
+The above three formats all have the corresponding tooling
+to help operationalize the formats into practice that are listed
+Fig. 1. (AI) Software supply chain and SBOM [10].
+on their respective websites. It is worth mentioning that the
+SBOM formats and tooling working group under the US
+National Telecommunications and Information Administration
+(NTIA) had an effort to summarize all tools supporting dif-
+ferent standards (i.e., SPDX list, CycloneDX list, SWID list).
+In terms of government-side SBOM efforts, with incidents
+such as the SolarWinds attack ringing the alarm of SSC
+security, the US government issued an executive order on en-
+hancing cybersecurity [12] in May 2021, explicitly mandating
+all companies trading with the US government to provide
+SBOMs. NTIA has published a series of documents and
+guidelines (e.g., SBOM minimum elements [7]) to facilitate
+SBOM development. The Cybersecurity and Infrastructure
+Security Agency (CISA) is also actively working on SBOM
+facilitation by regularly hosting listening sessions with the
+SBOM industrial community.
+Notably, the Linux Foundation published the SBOM readi-
+ness report [5] in January 2022, which surveyed 412 organi-
+zations across the globe. According to the report, 98% of the
+surveyed organizations are concerned about software security,
+over 80% are aware of the US executive order, and 90%
+have started their SBOM journey. Although the evolvement of
+SBOM adoption and application remains a concern, the report
+predicts that the SBOM tool market is expected to explode
+in 2022 and 2023. As of January 2022, there were about
+20 SBOM tool vendors in the market, and some were from
+adjacent markets like Software Composition Analysis (SCA)
+which dates back to 2002 [13]. Meanwhile, various open
+source tools are available with a focus on SBOM generation.
+However, while the SBOM readiness report comprehen-
+sively covers a broad category, their reports were based on
+multi-choice questions with limited choices, which constrained
+the possible answers. The guidelines and documents published
+by NTIA provide a reference for understanding SBOM and
+SBOM practice but lack the actual perception from the SBOM
+practitioners. To fill the gaps, we interviewed 17 SBOM
+practitioners (see Table I) with open-ended questions on how
+they perceive current SBOM practice and SBOM tooling.
+We then organized an online survey containing statements
+from the interviews, allowing more practitioners to validate
+the statements. Compared with the SBOM readiness report
+2631
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+and NTIA’s documents, we focus on how actual SBOM
+practitioners think about SBOMs and how they are addressing
+SBOMs in production without limiting the possible answers.
+III. R ESEARCH M ETHODOLOGY
+This study presents an exploratory empirical study on
+SBOM status in practice. Fig. 2 shows the overall methodology
+adopted in this paper that consists of three stages, following a
+mixed qualitative and quantitative approach [14]. We described
+the planning and preparation stage in Section III-A; the data
+collection and analysis processes of the interviews and the
+online survey are presented in Sections III-B and III-C.
+Fig. 2. Overall research methodology.
+A. Stage Zero: Planning and Preparation
+At the planning stage, we prepared a research protocol1 and
+drafted two types of interview questions: demographics and
+open-ended. For demographics, we ask about the participants’
+background information, such as job roles and experiences.
+For the open-ended questions, we asked how the participants
+perceive SBOMs. We obtained ethics approvals for this study.
+B. Stage One: Interview
+Pilot interview and protocol refinement. Before the formal
+interviews, we conducted a small-scale pilot interview with 3
+participants from our connections. Based on their feedback
+and suggestions, we adjusted some interview questions.
+Participant recruitment. We recruited 17 SBOM prac-
+titioners from 13 organizations (e.g., CISA, Oracle) across
+7 countries (see Table I). Interviewees were recruited by:
+a) emailing our contacts who helped further disseminate the
+invitation emails to their colleagues; b) emailing developers
+on GitHub working on SBOM-related projects whose email
+addresses are public; c) advertising on Twitter and LinkedIn
+and interested people can contact the first author. The 17
+interviewees have worked in software-related fields for around
+14 years on average (min 4 years and max 30 years), while
+they have been working actively in SBOM-related fields for
+around 1.4 years on average (min 2 months and max 5 years).
+We will refer to the 17 interviewees as I1 to I17.
+1 https://drive.google.com/drive/folders/1gylBoeF09sJRg2xEpJh2tWnjp0cC
+MhxM?usp=sharing
+TABLE I
+I NTERVIEWEE D EMOGRAPHICS *
+ID Field of work Country Work exp. SBOM exp.
+I1 Dev. China 10 0.5
+I2 Dev. China 10 0.2
+I3 Dev. China 10 0.2
+I4 Dev. & Sec. Australia 20 3.0
+I5 Dev. US 18 0.5
+I6 Dev. US 20 0.5
+I7 Sec. Brazil 4 0.5
+I8 Dev. & Cnslt. Ireland 15 1.5
+I9 Sec. India 5.5 1.0
+I10 Cnslt. & Adv. US 20 3.0
+I11 Dev. & Sec. (SBOM tool) Israel 12 1.5
+I12 Cnslt. & Adv. Israel 15 0.3
+I13 Dev.&Sec.&Res. Australia 30 2.0
+I14 Dev. & Sec. & Res. US 10 3.0
+I15 Dev. India 8 1.5
+I16 Dev. (SBOM tool) US 20 1.0
+I17 Cnslt. & Adv. US 15 5.0
+*Dev./Sec.: Software Development/Security; Cnslt.: Consultant; Adv.:
+Advisor; Res.: Researcher. Experiences are listed in years, as of July 2022
+Transcribing and coding. 1) Transcribing. The interviews
+were audio-recorded. The first author transcribed the audio
+recordings, and the second author double-checked the tran-
+scripts. 2) Pilot coding. The first two authors (i.e., coders)
+conducted a pilot coding of the 3 pilot interview transcripts.
+They discussed the initial coding results and reached a certain
+level of preliminary agreement on the granularity of thematic
+coding. 3) Code generation. The coders then performed the-
+matic coding to qualitatively analyze the interview transcripts
+[15], [16] of 17 interviewees using MAXQDA2022 tool. The
+first coder generated 574 codes under 86 cards (i.e., repetitive
+and similar codes classified into the same category). The
+second coder generated 364 codes under 41 cards. After
+discussing the coding results with a third author, the coders
+further cleared the coding granularity, combined similar cards,
+and disposed of cards with limited value. Finally, a total of 54
+unique cards were generated.
+Data analysis and open card sorting. The coders sep-
+arately sorted the 54 generated cards into potential themes
+(not predefined) given thematic similarity. After the sorting
+process, the coders calculated Cohen’s Kappa value [17] to
+assess their agreement level. The overall value was 0.77,
+indicating substantial agreement. The coders discussed their
+disagreements to reach a common ground. he coders reviewed
+and agreed on the final themes to reduce card sorting bias.
+Eventually, we derived 26 statements (see Table III) under
+3 themes: State of SBOMs Practice (T1), SBOM Tooling
+Support (T2), and SBOM Issues and Concerns (T3). All the
+authors have double-checked our coding results to ensure the
+reported results are accurate and consistent.
+C. Stage Two: Online Survey
+We conducted an online survey to confirm or refute the ex-
+tracted statements. We designed the survey following Kitchen-
+ham and Pfleeger’s guideline [18]. The survey was anonymous,
+and all information collected was non-identifiable.
+2632
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+TABLE II
+S URVEY RESPONDENTS DEMOGRAPHICS *
+Field of work Project team Work exp. SBOM exp.
+Dev. (38.6%) <10 ppl. (16) <1 year (1) <6 months (17)
+Sec. (30.1%) 10-20 ppl. (20) 1-3 years (11) 0.5-1 year (17)
+Cnslt./Adv. (10.8%) 20-50 ppl. (15) 3-5 years (13) 1-2 years (13)
+Mgmt (9.7%) >50 ppl. (15) 5-10 years (9) >2 years (19)
+Res. (9.7%) - >10 years (32) -
+Other (1.1%) - - -
+*Mgmt.: Management; ppl.: people. Since multiple answers are supported
+for respondents’ work, field of work is listed in percentages while the
+others are listed with response numbers.
+Survey design and pilot study. The survey was published
+via Qualtrics. Different types of questions were included in the
+survey (e.g., multiple choice and free text). The statements are
+scored on a 5-point Likert scale (Strongly disagree, Disagree,
+Neutral, Agree, Strongly agree), with an additional “Not sure”.
+We piloted the survey with six participants from Australia
+and Singapore and then refined the survey. The pilot study
+results were excluded from the final results. The formal
+survey consists of 7 sections: demographics, SBOM status quo,
+generation, distribution, tooling, benefits, and concerns.
+Participants recruitment. To increase the number of par-
+ticipants, we adopted the following strategy for recruitment:
+● We contacted industrial practitioners from several compa-
+nies worldwide and asked for their help in disseminating
+the survey invitation emails.
+● We sent invitation emails to over 2000 developers from
+GitHub whose email addresses are publicly available.
+● We posted the recruitment advertisement on social media
+platforms (i.e., Twitter and LinkedIn).
+We received a total of 129 responses, including 27 with
+respondents selecting “(Very) unfamiliar with SBOM”. Note
+that there could be more people unfamiliar with SBOM who
+did not respond to our survey. After removing them and
+the incomplete responses and responses completed within 2
+minutes, we had 65 valid responses. We acknowledge that the
+number of responses is not as ideal as similar empirical studies
+(e.g., [16], [19]). However, we believe this is consistent with
+our findings on the lack of SBOM adoption and education
+(i.e., Findings 1 and 10). The 65 participants come from
+15 countries across 5 continents. The top 3 countries where
+the participants reside are Australia, China, and the US. An
+overview of the survey respondents’ demographics is presented
+in Table II. It is worth noting that although nearly half (47.7%)
+of the respondents have worked in the software field for over
+10 years, only one quarter (27.7%) have worked on SBOMs
+for over 2 years, indicating that SBOM is still a relatively
+fresh concept to software practitioners.
+Data analysis. Apart from the demographics, SBOM fa-
+miliarity questions, and a final optional free-text question, all
+statements are presented as Likert-scale questions (see the bar
+charts in Table III) for the evaluation of the agreement degree.
+IV. S TUDY RESULTS
+This section reports the study results. In Table III, we drew
+the Linkert distribution graphs for 26 statements that were re-
+organized into four topics and calculated the overall scores
+based on: Strongly Disagree (1), Disagree (2), Neutral (3),
+Agree (4), Strongly Agree (5), and Not Sure (0). We calculated
+the percentages of “agrees” (strongly agree and agree) and
+“disagrees” (strongly disagree and disagree) of each statement.
+Following the SBOM background in Section II, this section
+starts by introducing the current SBOM practices (Section
+IV-A). Then Section IV-B investigates the current tooling
+status of SBOMs. Finally, Section IV-C presents practitioners’
+primary concerns for SBOMs.
+A. RQ1: What is the current state of SBOM practice?
+To answer RQ1, we discussed 16 statements in this section
+based on T1 (see Table III). Our results suggest that SBOMs
+are not widely adopted. SBOM generation and distribution re-
+quire further standardization and maturer mechanisms. SBOM
+data validation is generally neglected. For the typical SBOM
+use case of vulnerability management, the exploitability status
+classification should be more than binary.
+1) SBOM benefits: We summarized 3 statements (i.e., S1-
+S3) on SBOM benefits based on the interviews.
+15 of 17 interviewees mentioned that the enhanced trans-
+parency of the software supply chain is one of the exceptional
+advantages of SBOMs [S1, 90.8% agree, 1.5% disagree].
+Transparency brings a lot of favorable consequences, such
+as end-of-life software management, vulnerability tracking,
+and license compliance checking [5]. “The biggest benefit is
+knowing exactly what is being bundled in your software, right?
+So it is to assure our customers that, if there’s a vulnerability
+reported, you immediately know [whether] you are impacted
+or not, if the SBOM is accurate.” (I13-Dev.&Sec.&Res.)
+Another benefit originates from the SBOM data. The uni-
+fication of software composition details provided by SBOMs
+is beneficial as the standardized SBOM data has the potential
+to be further built upon. “The SBOM itself isn’t the valuable
+part. The valuable part is, how do we turn that data into
+intelligence, into action.” (I17-Cnslt.&Adv.) Based on the
+SBOM data, it is promising that there will be SBOM-centric
+ecosystems emerging [S2, 86.2% agree, 1.5% disagree]. How-
+ever, due to the lack of SBOM adoption (see Section IV-A2),
+such ecosystems are long-term goals not to be achieved soon.
+Thirdly, although adopting SBOMs requires extra efforts
+(e.g., additional tools and processes, education to related
+personnel), the benefits of SBOMs outweigh the costs [S3,
+86.2% agree, 7.7% disagree].  Although some organizations
+are “worried whether SBOMs would increase the cost of a
+software product” (I1-Dev.),  the majority favor the benefits
+brought by SBOMs as the potential loss without SBOMs can
+be devastating. “What I think about is, what is the cost when
+a vulnerability is exploited? [...] if you look at SolarWinds
+event, that cost was $800 million.” (I6-Dev.)
+2633
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+TABLE III
+INTERVIEW AND SURVEY RESULTS ON SBOM STATEMENTS
+Likert distribution
+Statement Graph Score
+T1. State of SBOM practice
+S1. Improving transparency and visibility into the software products is the biggest benefit of SBOMs. 4.42
+S2. SBOM data form the foundation of a potential SBOM-centric ecosystem. 4.05
+S3. The benefits brought by SBOMs outweigh the costs of SBOMs (e.g., extra learning and management of SBOMs & tools).
+Section IV-A1
+SBOM benefits 4.34
+S4. Currently third-party (open source or proprietary) components are not equipped with SBOMs. 4.11
+S5. SBOMs are not generated for all software products (produced/used) within an organization.
+Section IV-A2
+SBOM adoption 4.25
+S6. SBOMs can be generated at different stages of the software development lifecycle. 4.14
+S7. Currently, a new SBOM is not always re-generated when there’s any change to software artifacts.
+Section IV-A3
+SBOM generation points 3.31
+S8. SBOMs are currently generated in a non-standardized format (e.g., not SPDX nor CycloneDX nor SWID). 2.86
+S9. Despite the 7 minimum data fields recommended by NTIA, the minimum fields are not necessarily all included in SBOMs. 3.57
+S10. In practice, SBOMs are extended with more useful data fields (other than the 7 minimum data fields) whenever possible.
+Section IV-A4
+SBOM data fields and
+standarization 4.34
+S11. SBOMs are currently only generated for internal consumption. 2.97
+S12. Access control should be required for the distribution of SBOMs for proprietary software/components. 4.14
+S13. Content tailoring (sharing partial SBOMs) should be required for SBOM distribution of proprietary software/components.
+Section IV-A5
+SBOM distribution 3.57
+S14. SBOM producer’s (i.e., software vendor) reputation is important for assessing SBOM integrity (e.g., completeness). 3.4
+S15. Currently there are no validation mechanisms to ensure SBOM integrity (accuracy, completeness etc).
+Section IV-A6
+SBOM validation 3.28
+S16. Current vulnerability management with SBOMs doesn’t focus on the actual exploitability of the vulnerability. Section IV-A7
+Vul. & exploitability 3.72
+S17. SBOMs for AI software are different from SBOMs for traditional software. Section IV-A8
+AIBOM 3.26
+T2. State of SBOM tooling support
+S18. Although existing sources (e.g., package manager, POM.xml) are already there, it is still necessary to parse and feed
+metadata from these sources into a standard format via SBOM tools.
+Section IV-B1
+Necessity of SBOM tools 4.08
+S19. There are significantly limited tools for SBOM consumption. 4
+S20. SBOM consumption should be integrated with existing tools (e.g., vulnerability/configuration management tools).
+Section IV-B2
+Availability of SBOM tools 4.03
+S21. Existing SBOM tools can be hard to use (e.g., lack of usability, complexity). 3.57
+S22. SBOM tools lack of interoperability and standardization (e.g., the hash of one component generated by different tools
+can be different).
+Section IV-B3
+Usability of SBOM tools 3.92
+S23. End users can’t validate the integrity (e.g., accuracy and completeness) of the generated SBOMs by existing tools. Section IV-B4
+Validation of SBOM tools 3.69
+T3. SBOM issues & concerns
+S24. Existing SBOM standards don’t meet current market demands (e.g., the standards support only limited fields). 2.85
+S25. Attackers can take advantage of the information contained in SBOMs. 3.63
+S26. There is hesitation in adopting SBOMs due to various concerns (e.g., lack of basic IT asset management).
+Section IV-C
+SBOM concerns 3.98
+Finding 1: The transparency brought by SBOMs can
+enable accountability, traceability and security, but
+there is a lack of systematic consumption-scenario-
+driven design of SBOM features.
+2) SBOM adoption: We summarized 2 statements (i.e., S4-
+S5) on SBOM adoption status (see Table III).
+Despite the benefits of SBOMs and the SBOM readiness
+report’s [5] optimistic results that 90% of the 412 sampled
+organizations have started or are planning their SBOM journey,
+the adoption of SBOM is not as optimistic according to our
+interviews and survey. For example, most existing third-party
+software or components, either open source or proprietary, are
+not equipped with SBOMs [S4, 83.1% agree, 13.8% disagree].
+As I2 stated, “when introducing third-party components to
+our organization, we need to try to generate SBOMs for
+them because not all of them have SBOMs.” (I2-Dev.) How-
+ever, considering the prevalence of OSS, the unavailability
+of SBOMs for (open-source) software/components also holds
+software vendors back from SBOM adoption as they may
+wonder whether SBOM adoption is an industrial consensus.
+In addition, SBOMs are not generated for all software
+even inside a software vendor organization [S5, 87.7% agree,
+7.7% disagree]. As stated by I10, “software vendors may be
+producing SBOMs for some customer products. But I bet most
+of them don’t generate SBOMs for the financial software they
+are using.” (I10-Cnslt.& Adv.)
+Finding 2: A large portion of widely used software,
+especially OSS, does not have SBOMs. The incentives
+for generating SBOMs for OSS and proprietary
+software need to be propagated.
+3) SBOM generation point: We summarized 2 statements
+(i.e., S6-S7 in Table III) on SBOM (re-)generation.
+SBOMs can be generated at a set of different stages in the
+software development life cycle (e.g., build time, run time,
+before delivery, after third-party components introduction, etc.)
+[S6, 84.6% agree, 12.3% disagree], which differs from case to
+case as “the challenge here sort of builds on the sheer diversity
+of software” (I17-Cnslt.&Adv.) (e.g., modern/legacy software,
+container images, cloud-based software). For example, “for
+legacy software that’s already out there in the wild, maybe
+you don’t have reproducible builds. You only have that built
+artifacts [...] it’s like you can’t do it (generate SBOMs) at
+2634
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+build time anymore [...] it’s just too difficult [...] But you could
+probably do a run time [SBOM] generator.” (I8-Dev.&Cnslt)
+As stated by I8, “I don’t really think there is a perfect
+time [for SBOM generation]”. (I8-Dev.&Cnslt) Since software
+development goes through a life cycle, ideally an SBOM
+should be generated at the early stages and then gradually
+enriched with more information from the latter stages,
+which was supported by I12 and I14. “I think the way to
+actually include the most full SBOM is to have visibility
+towards the whole cycles, from the report to the build to the
+factory.” (I12-Cnslt.&Adv.) “I do not think we should produce
+an SBOM as a one-shot process, but rather we should be
+carrying evidence and partial SBOMs and enriching them in
+every single operation.” (I14-Dev.&Sec.&Res.)
+As for SBOM re-generation, it is evident that whenever any
+change happens to any software artifact, the corresponding
+SBOMs should be timely re-generated to reflect this change,
+which is hardly the current practice followed by every SBOM
+producer [S7, 53.8% agree, 35.4% disagree]. As stated by I10,
+“that is more of an aspirational goal - it’s not something that
+will be realized right away. Because right now it would be just
+great if they put out a new SBOM whenever they did a new ma-
+jor version, and that is better than nothing.”(I10-Cnslt.&Adv.)
+However, since some organizations are re-generating SBOMs
+upon each change, and if SBOM re-generation is to be a
+standard practice, solutions like SBOM version control are
+needed for managing the SBOMs. As stated by I8, with
+different versions of SBOMs, “you need to version control
+your SBOMs, and figure out how to distribute that information
+to your customers.” (I8-Dev.&Cnslt)
+Finding 3: SBOM generation is belated and not dy-
+namic, while ideally SBOMs are expected to be gener-
+ated during early software development stages and
+continuously enriched/updated.
+4) SBOM data fields standardization: In this subsection, we
+investigated what data fields generated SBOMs contain, based
+on S8-S10 in Table III, since not knowing what to include in
+an SBOM is the second biggest concern for producing SBOMs
+according to the SBOM readiness report [5].
+First, despite the existence and relative prevalence of two
+major SBOM standards (i.e., SPDX and CycloneDX), some
+organizations generate SBOMs based on their customized non-
+standard formats [S8, 27.7% agree, 32.3% disagree]. Based
+on the survey results, although more respondents agree with
+standardized SBOM formats, over one quarter agree with
+customized SBOM generation. As I4 stated, “the people I
+spoke to [in some organizations] might have been doing this
+[generating SBOMs], but they might not have been doing
+a standard-format SBOM. They would just be keeping an
+inventory of all their software components.” (I4-Dev.&Sec.)
+Second, although there are 7 minimum SBOM data fields
+recommended by NTIA [7], in practice, generated SBOMs
+don’t always meet the minimum bar [S9, 63.1% agree, 24.6%
+disagree] for two main reasons (i.e., software vendor cus-
+tomization, data availability). Some software vendors choose
+only to include a subset of the minimum data fields, or
+customize their minimum requirements to meet their respective
+needs. According to I3, his/her organization “has its own
+minimum requirements [different from NTIA’s]” (I3, Dev.).
+Software vendors sometimes do not include all the minimum
+data fields as the relevant data is not always attainable. “The
+truth is, I tried to put in as much as what you said (7
+minimum data fields). I don’t have access all the time to all
+the details.” (I11-Dev.&Sec.(SBOM tool)) As a result, when
+relevant information of certain data fields is unavailable, the
+generated SBOMs can be “full of non-assertion elements [...]
+In practice, this means that, yes, the standards themselves can
+support the NTIA recommendation; No, the tools are omitting
+those fields or leaving them blank.” (I14-Dev.&Sec.&Res.)
+Third, for some organizations producing SBOMs or building
+SBOM tools to produce SBOMs, they want to include/sup-
+port as much “useful” information in SBOMs [S10, 87.7%
+agree, 4.6% disagree]. For the former, since an SBOM can
+effectively help with internal software supply chain manage-
+ment, they prefer to generate more comprehensive SBOMs
+with additional information such as vulnerability. As I13
+mentioned, “we want to produce the best information [...]
+then the developers can look at it and then do their work”
+(I13-Dev.&Sec.&Res.) For the latter, the more comprehensive
+information their SBOM tools support, the more competitive
+they are in the market. As stated by I11, “I also have a
+big scope of metadata depending on the target other than
+the base.” (I11-Dev.&Sec.(SBOM tool)) Furthermore, as I14
+pointed out, “something relatively worse happens [...] to
+create business value [...] they are trying to extend it [an
+SBOM] with things that may or may not be relevant to the
+problem.” (I14-Dev.&Sec.&Res.)
+Finding 4: Despite official recommendations on mini-
+mum SBOM data fields, there is still a lack of consen-
+sus on what to include in SBOMs.
+5) SBOM distribution: In this subsection we discussed 3
+statements (i.e., S11-S13 in Table III).
+A considerable portion of the respondents agree that “or-
+ganizations generate SBOMs for internal consumption, rather
+than giving them to customers” (I11-Dev.&Sec.(SBOM tool)
+[S11, 40% agree, 38.5% disagree]. The authors notice a lack of
+consensus on this statement from the survey respondents. We
+believe this is consistent with the general “lack of consensus”
+status of the SBOM as in the SBOM readiness report [5],
+resulting from the relative recentness and lack of adoption.
+However, since SBOMs are now being distributed in prac-
+tice, proper distribution mechanisms are needed. According to
+the SBOM readiness report [5], one of the leading concerns for
+SBOM production is that some information inside an SBOM
+is too sensitive and risky to be public. Since the source code
+is already publicly available for OSS, their SBOMs should be
+public. For proprietary software/components, although some
+2635
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+of the SBOMs can be public, “authenticated [access control]
+is going to be the norm” (I4-Dev.&Sec) [S12, 76.9% agree,
+13.8% disagree], depending on the software vendors’ policies.
+“At least for some segments of the market, I think access
+management is part of it. You need to be able to share your
+SBOMs with whomever you want to share, and not have all
+of the world get access to it.” (I12-Cnslt.&Adv.)
+Apart from access control, content tailoring (selective shar-
+ing) is also helpful for mitigating the above concern. There can
+be a negotiated compromise between the software vendor and
+its downstream procurers on what to include in the distributed
+SBOMs, instead of sharing the complete SBOMs [S13, 60%
+agree, 24.6% disagree]. “There’s got to be a mechanism...
+like a router in the middle, that takes the SBOMs or VEXs
+produced by the suppliers and routes them down to each
+end user, exactly what they need” (I0-Cnslt.&Adv.), so that
+“only the right people can see the right information.” (I13-
+Dev.&Sec.&Res.)
+Finding 5: Proprietary and sensitive information in
+SBOMs introduces barriers to SBOM distribution. Se-
+lective sharing (content tailoring) and access control
+mechanisms need to be considered.
+6) SBOM validation: This subsection is based on S14 and
+S15 (see Table III).
+The lack of SBOM integrity validation is a shared problem
+mentioned by 13 out of 17 interviewees. Without reliable vali-
+dation measures [S15, 49.3% agree, 26.2% disagree], software
+procurers may only roughly assess the quality of an SBOM
+by referring to the SBOM producer’s reputation [S14, 50.8%
+agree, 13.8% disagree]. SBOM integrity is two-fold: a) SBOM
+data integrity (whether the SBOM has been tampered with),
+and b) SBOM tooling integrity (tooling capability as to the
+competence to generate complete and accurate SBOMs; and
+tooling security as to whether the SBOM generation tools are
+hacked). We discuss SBOM tooling integrity in Section IV-B4.
+SBOM data tampering can come from outside and inside
+an organization (i.e., external/internal tampering). External
+tampering is more straightforward as an SBOM can be “easy
+to tamper [with] and easy to fake” (I14-Dev.&Sec.&Res.)
+without reliable validation methods. Thus, proper validation
+mechanisms are needed (e.g., signing using sigstore’s Cosign).
+Inside tampering means a software vendor may change the
+SBOM data considering customer acceptance and security
+issues. For example, I14 and I15 mentioned instances of
+internal tampering based on their experiences:
+a) “You could have a release engineer at the last minute,
+realizing that they wanted to change the SBOM just because
+otherwise, the customer wouldn’t take it. It’s not that the whole
+organization lied. But it does mean that they got to tamper with
+the SBOM that doesn’t again faithfully represent the product
+that they weren’t given.” (I14-Dev.&Sec.&Res.)
+b) “Whenever we are going to use an open source project,
+there has to be a security check [...] if some kind of [vul-
+nerable] code is there, we just need to remove it [...] we are
+not actually passing those kinds of changes to the public.”
+(I15-Dev.)
+Finding 6: Trust in SBOM data needs to be assured
+considering tampering threats. SBOM data valida-
+tion/verification mechanisms and integrity services
+are needed.
+7) Vulnerability and exploitability: In this section we
+discuss SBOMs for vulnerability management and the ex-
+ploitability of vulnerabilities (i.e., S16 in Table III).
+Although vulnerability management is a representative
+SBOM use case [20], vulnerability management currently
+barely considers the actual exploitability [S16, 73.8% agree,
+13.8% disagree]. Nevertheless, the exploitability of a vulner-
+ability should be taken seriously, as a vulnerability may not
+necessarily be exploitable [21].
+“I think it’s a very, very interesting point, and it’s a very
+legit issue. Vulnerability and exploitability are totally different.
+You can’t simply send a long report to the developers and ask
+them to update each and every vulnerable dependency that
+has been flagged. I know the development team might end up
+ignoring your report, or come back at you saying, ‘are you
+able to exploit this vulnerability? No? Then why should I go
+and update it if you are unable to exploit it?’” (I9-Sec.)
+As mitigation, vulnerabilities are often selectively fixed
+based on the criticality (e.g., The Common Vulnerability
+Scoring System (CVSS) score). As stated by I9, “if it’s a
+critical or a high vulnerability [...] then make sure it is
+updated. But when it comes to [a] medium or low [criticality
+vulnerability], then ignore it.” (I9-Sec.) Although there are
+efforts towards exploitability, such as CISA’s Known Exploited
+Vulnerabilities Catalog that serves as a “must patch list”, there
+are only limited records (around 800 as of August 2022) in
+this catalog.
+Vulnerability Exploitability eXchange (VEX) has emerged
+as a tailored method to cope with such problems.  A VEX
+is a security advisory produced by a software vendor that
+allows the assertions of the vulnerability status of a software
+product [22]. As companion artifacts to SBOMs [23], VEXs
+provide SBOM operators with clearer understanding of the
+vulnerabilities and suggested remediation.  However, cur-
+rent exploitability evaluation is manual and subjective to the
+domain knowledge of the security experts [24], [25]. Also,
+“the ability to differentiate between whether it’s exploitable or
+not is a hard thing to do itself” (I11-Dev.&Sec.(SBOM tool)),
+“especially if you want to automate it”. (I13–Dev.&Sec.&Res.)
+What is more, “there is no way to confirm this [VEX], and
+it’s actually very, very hard to prove a negative. So if you see
+a VEX entry that says this [vulnerability] doesn’t hit me, the
+only way to prove it wrong is to make an exploit yourself.
+Again, if you are able to do that, then you’re almost making
+things worse, right? (I14-Dev.&Sec.& Res.)”
+ To further complicate this problem, there is hardly guar-
+anteed unexploitability. As I11, an SBOM tool developer
+2636
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+with security (hacker) experience, stated, “I agree the more
+valuable these exploitable vulnerabilities are, but I don’t agree
+that the ones defined less exploitable are not valuable. I used
+to be on the attacker’s side [...] Hackers can take their time,
+and they can find a way to put together a lot of things
+that look very not exploitable, and at the end of the day,
+find themselves with very easy and exploitable access.” (I11-
+Dev.&Sec.(SBOM tool)) A possible solution is there should be
+“potential exploitability” (I14-Dev.&Sec.& Res.).
+Finding 7: It is unclear what to do with vulnerabilities
+with limited exploitability exposed by SBOMs/VEXs.
+8) AIBOM: This subsection is based on S16 (see Table III).
+AI software is software with AI components. Compared
+with SBOMs for traditional software, SBOMs for AI software
+(i.e., AIBOMs) are different [S16, 47.7% agree, 24.6% dis-
+agree]. Although some interviewees thought an AIBOM “con-
+tains only additional AI package information” (I1-Dev.), the
+AI artifacts (e.g., data, code, model, configuration) also need
+provenance and co-versioning [26], [27]. An AIBOM (see
+Fig. 1) records not only the software composition information
+as a traditional SBOM, but also contains information about
+the data/model/code/configuration co-versioning registries, al-
+lowing transparency and accountability into the AI artifacts
+for AI model training and evaluation. Considering the AI
+software deployment is continuous progress (e.g., continuous
+training in case of data/concept drift), these AI artifacts’ co-
+versioning registries are more dynamic and subject to change,
+while the component inventory information is relatively static.
+To reduce frequent re-generation of the AIBOM, the co-
+versioning registries can be independent of the AIBOMs,
+instead of being embedded in the AIBOMs.
+B. RQ2: What is the current state of SBOM tooling support?
+This section discusses 6 statements (see T2 in Table III).
+Although some practitioners argue that SBOM tools were not
+necessary, the importance and necessity of SBOM tools are
+recognized by most participants. However, the existing tools
+still lack maturity in general and require further development.
+1) Necessity of SBOM tools: This subsection is based on
+S18 in Table III.
+The most interesting argument about SBOM tooling is
+the necessity of using SBOM tools to generate SBOMs.
+Since currently few organizations (e.g., the US government
+agencies) are actually requiring SBOMs to be provided upon
+software delivery,  some interviewees think they do not
+have to generate SBOMs, especially when most SBOM tools
+serve like a “proxy”: they merely feed the existing metadata
+(e.g., package manager) into a standard format, but the data
+is already there with or without SBOMs. “We do not use
+SBOMs internally [...] because we have tools, which is where
+the SBOM information is coming anyway: package manager.
+Those tools generally just take a look at the files in the system
+and the configuration of the system, whereas SBOM tools just
+essentially parse those and then try to use that in a format. So,
+if we don’t have a lot of end users... why would we introduce
+this (SBOM)? It’s like a middleman that really doesn’t produce
+much.” (I14-Dev.&Sec.&Res.)
+ That being said, most survey respondents think generat-
+ing SBOMs using SBOM tools is necessary [S18, 83.1%
+agree, 10.8% disagree], which is consistent with the benefit
+of standardization and unification of the software composition
+data enabled by SBOMs discussed in Section IV-A1. Gen-
+erating SBOMs is more than simply putting metadata from
+different sources into a standard format as SBOMs are usually
+enriched with information such as licenses.
+2) Availability of SBOM tools: In this subsection, we
+discussed statements S19-S20 in Table III.
+Tooling is an integral part of SBOM, as SBOMs are not
+manually generated nor intended for direct human consump-
+tion. The generation and consumption of SBOMs rely on
+SBOM tools. “Shift left” originates from DevSecOps [28],
+which means shifting the security work to earlier stages of
+the software development life cycle so that security issues can
+be identified and fixed earlier. Considering there is a “lack of
+more developer-oriented (SBOM) tools that are more familiar
+by developers” (I7-Sec.), and SBOMs are tightly coupled with
+security tasks, SBOM tools should also consider “shift left”.
+Despite there is a lot of existing SBOM tools as mentioned
+in Section II, contrary to the finding in the SBOM readiness
+report [5] that “SBOM consumption mirrors SBOM produc-
+tion”, our finding shows that currently, the “SBOM genera-
+tion is ahead of SBOM consumption” (I17-Cnslt.&Adv.), and
+there are significantly limited tools for SBOM consumption
+[S19, 75.4% agree, 12.3% disagree]. As stated by I17, “the
+large bucket of what we don’t have today in 2022 is SBOM
+consumption.” (I17-Cnslt.&Adv.) Without SBOM consumption
+tools, even if an SBOM was provided to a software procurer,
+the procurer would wonder, “what do I do with the SBOMs?
+How do I process them? How do I analyze them?” (I12-
+Cnslt.&Adv.) Besides dedicated SBOM consumption tools, a
+possible solution is to feed SBOMs into existing IT asset
+management tools [S20, 41.5% agree, 12.3% disagree], which
+requires functional extensions.
+3) Usability of SBOM tools: This section discusses S21-
+S22 in Table III.
+Although the SBOM tools market is proliferating with the
+expectation to “explode” in 2022 and 2023 [5], the usability
+of existing tools remains an issue. SBOM tools can be hard to
+use due to various reasons. (e.g., complexity, aggressivity, lack
+of generalization) [S21, 64.6% agree, 18.5% disagree]. For
+example, “to use the CycloneDX Maven plugin, it’s required
+to import this plugin in the POM.xml file. For open source
+software, it is all right. But for proprietary software, this
+introduces invasion, which can be a problem”. (I3-Dev.)
+Although four interviewees (i.e., I9-I12) mentioned that
+there were user-friendly tools such as Dependency-track, the
+interviewees also acknowledged that most SBOM tools were
+open source and not enterprise-ready. A problem with open
+source tools is, “an organization needs to have the capability
+of knowing open source projects, running them, fine-tuning
+2637
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+them towards its needs, maintaining them” (I12-Cnslt.&Adv.),
+which can be a considerable problem for smaller-scale orga-
+nizations and start-ups.
+Tooling interoperability and standardization also hinder the
+usability of SBOM tools [S22, 73.8% agree, 10.8% disagree].
+As mentioned by I17, SBOM tooling is also “an area where
+we need further harmonization and standardization.” (I17-
+Cnslt.& Adv.) For instance, the SBOM data (e.g., component
+hash) of the same software/components generated by different
+tools can be different [7], while “the whole point of a hash is
+that it should be the same [for the same component], so that
+[...] downstream users can validate it”. (I17-Cnslt.& Adv.)
+4) Integrity of SBOM tools: In this subsection, we discuss
+SBOM tooling integrity based on S23 in Table III.
+As mentioned in Section IV-A6, SBOM integrity consists
+of SBOM data integrity and SBOM tooling integrity. SBOM
+tooling integrity also includes two aspects: a) tooling compe-
+tence: the completeness and accuracy of the accuracy caused
+by SBOM tooling capability; and b) tooling security: whether
+the SBOM generation toolchain has been maliciously altered.
+Most respondents agree that the integrity of SBOMs gen-
+erated by existing tools cannot be validated [S23, 69.2%
+agree, 18.5% disagree]. The accuracy and completeness of
+the generated SBOMs caused by tooling competence is a
+common concern for generating SBOMs. To the best of our
+knowledge, there is no comprehensive measure or validation
+against such unintentional mistakes from the end users’ point
+of view. However, the intentional tampering resulting from
+compromised toolchains is another story. One possible solution
+is to evaluate the SBOM tools’ assurance based on Automated
+Rapid Certification Of Software (ARCOS) [29] though it is
+still a work in progress.
+Finding 8: There is a lack of maturity in SBOM tool-
+ing. More reliable, user-friendly, standard-conformable,
+and interoperable enterprise-level SBOM tools, espe-
+cially SBOM consumption tools, are needed.
+C. RQ3: What are the main concerns for SBOM?
+This section investigates practitioners’ main concerns for
+SBOMs based on T3 in Table III. During the interviews,
+SBOM tool developers’ common concern lay with the SBOM
+standard formats. Most respondents remained concerned about
+SBOMs being “roadmaps for attackers” [30]. The most fun-
+damental issue is the lack of SBOM adoption and education.
+1) SBOM formats’ lack of extensibility: In this subsection
+we discussed S24 in Table III.
+There are mainly two competing SBOM standard formats
+(i.e., SPDX and CycloneDX), and neither can fully meet
+current market needs [S24, 35.4% agree, 33.8% disagree].
+Notably, this statement was mentioned by both interviewees
+(i.e., I11, I16) working on SBOM tool development. Although
+the respondents show a discrepancy and lack of consensus on
+this statement, it is consistent with the interview results.
+Interestingly, I11 considered the SBOM format standardiza-
+tion to be one of the most significant benefits, while agreed
+the existing standards remain to be developed.  On the one
+hand, “the big advantage [of SBOMs] is standardization.
+The formats allow a lot of people to understand the same
+language” (I11-Dev.&Sec.(SBOM tool)). It offers “a unified
+framework to communicate software composition information”
+(I14-Dev.&Sec.& Res.).  On the other hand, some think the
+formats are not extensible enough. For example, “current for-
+mats only support one dependency relationship, DependsOn”
+(I11-Dev.&Sec.(SBOM tool)). We summarized possible format
+extension points in Section V-A2 based on the interviews.
+a) “My biggest concern is the dynamicity and the ability to
+use the standard formats of SBOM [...] to define the things I
+want to do with these SBOMs.” (I11-Dev.&Sec.(SBOM tool))
+b) “My biggest concern [...] is that the standardization is
+really kind of not good [...] competing standards [...] different
+properties, and different kinds of purposes. But consolidating
+down until reasonable sets of things are the same between the
+competing formats would be great.” (I16-Dev.(SBOM tool))
+Finding 9: Although there is a set of standard formats,
+they require further consensus, standardization as
+well as additional extension points.
+2) SBOM information sensitivity: In this section, we dis-
+cussed S25 in Table III.
+There are two types of opinions among the participants
+about the SBOM information sensitivity issue:  Some think
+certain information inside the SBOM is too risky and sensitive
+to be public, and the information inside an SBOM may serve
+the attackers as a ”roadmap” of the software and supply
+chain [S25, 63.1% agree, 20% disagree].  Meanwhile, others
+believe that there is no need to worry as the attackers do not
+need SBOMs because they already have tools to easily get
+the software composition information. SBOMs are actually
+roadmaps for defenders to help level the playing field [30]. Just
+as I4 stated, “on the surface, it seems like a valid concern. But
+[...] if you’re highly sophisticated cooperation, you probably
+don’t necessarily need this information. As a start-up, you
+don’t get to be a target in an attack [...] I think the benefit
+of that visibility is certainly on the defender’s side.” (I4-
+Dev.&Sec.)
+In addition, access control and content tailoring (see Section
+IV-A5) can also play a role in mitigating this concern.
+3) SBOM adoption and education deficiency: In this sec-
+tion, we discussed S26 in Table III.
+The most fundamental and imminent concern is limited
+SBOM adoption [S26, 80% agree, 7.7% disagree]. Organiza-
+tions may have various reasons for their hesitation to SBOM
+adoption. For example, they may worry about the industrial
+consensus or SBOMs’ value to customers, or they may lack
+even the most basic IT asset management.
+a) “I’m actually a bit worried about the people producing and
+consuming SBOMs because I think the market is not really
+2638
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+ready. They need to [be] educate(d), and many people don’t
+know what SBOMs are.” (I11-Dev.&Sec.(SBOM tool))
+b) “For SBOMs to become valuable to consume, many people
+need to produce [SBOMs] [...] So one of the concerns I have
+about SBOMs is, is everybody going to follow this pattern [to
+produce SBOMs]? Because there’re obviously people [saying]
+it’s not accurate so they don’t want to produce it.” (I6-Dev.)
+However, despite being concerned about SBOM adoption,
+I6 also agreed that “even the less accurate ones are better
+than adding no visibility” (I6-Dev.). Because “there’s always
+going to be a maturity problem. The idea that because some
+people can’t use SBOM so others shouldn’t [...] That’s not
+how we do security.” (I17-Cnslt.&Adv.)
+SBOM education is needed not only to educate the public
+for increased SBOM adoption, but the SBOM practitioners
+also need to be educated and realize SBOMs have unaddressed
+issues before they rush into generating SBOMs. “The problem
+right now is that we are almost putting the cart before the
+horse – we’re expecting the SBOMs to fix the problems rather
+than fixing the problems with an SBOM.” (I14-Dev.&Sec.)
+Finding 10: There is a lack of market awareness and
+good value propositions for SBOM adoption. SBOM
+advocators need to: a) leverage relevant regulation
+and use cases such as procurement evaluation and
+supply chain risk management to improve SBOM
+awareness; and b) promote more SBOM consump-
+tion tools with clear benefits.
+V. D ISCUSSION AND IMPLICATIONS
+A. Implications
+This section discusses below key implications for future
+SBOM research and development.
+1) Goal model: Based on the study results, we present
+a goal model for future SBOM endeavors (see Fig. 3). As
+mentioned in Sections IV-A2 and IV-C3, the lack of SBOM
+adoption causes a substantial obstacle to SBOM progress.
+To achieve increased SBOM adoption and more SBOM-
+enabled benefits, there are three goals to be satisfied:
+a) Higher-quality SBOM generation (findings 3, 4, 6,
+8, and 9): maturer tooling support for the generation of
+more standardized tamper-proof “dynamic” SBOMs [31]. For
+instance, further standardization on SBOM-included data fields
+is needed. SBOM industry should strictly conform to an agreed
+minimum data fields, while considering different industry and
+business sectors when adding optional data fields.
+b) Clearer benefits and use cases for SBOM consumption
+(findings 1, 2, 10): SBOM education (e.g., on SBOM-enabled
+benefits) results in increased SBOM adoption (including con-
+sumption); Increased SBOM adoption, in turn, leads to more
+developed SBOM-centric ecosystems with favorable use cases.
+c) Lower barriers in SBOM sharing and distribution
+(findings 5 and 7): The distribution and sharing of SBOMs and
+the vulnerability status (e.g., VEXs) need to be more flexible
+with proper mechanisms that meet both the software ven-
+dors’ and procurers’ needs. Technologies such as Blockchain,
+confidential computing (e.g., zero-knowledge proofs, secure
+multiparty computation for sharing without access) can poten-
+tially be leveraged to communicate SBOM data. During the
+distribution of SBOM data, there also need to be risk-based
+flexible policies to communicate unfixed vulnerabilities.
+Fig. 3. SBOM goal model.
+2) Format extension points: As discussed in Section IV-C,
+the interviewees mentioned several potential extensions to the
+existing SBOM formats. Other than supporting more depen-
+dency relationship types, another possible extension point is
+component types. “For example, the components of a Git is
+the commits, and CycloneDX does not have such a compo-
+nent [type] defined.” (I11-Dev.&Sec.(SBOM tool)) The third
+extension point is file location. “My organization has its own
+SBOM format [...] which has [...] things like where does it find
+something in a file system [...] However, formats like SPDX
+might not have a place for that.” (I16-Dev.(SBOM tool)) Also,
+Microsoft include build provenance information for tamper-
+evident SBOMs. Apart from the points mentioned above,
+another essential point is verifiable credentials [26] embedded
+in or linked to an SBOM. For traditional software, such
+credentials can prove the validity of software/components.
+For AI software, responsible AI-related information such as
+conformance to certain AI ethics principles can be included.
+B. Positioning with respect to SBOM readiness report
+This section compares the key differences between our
+findings and the SBOM readiness report’s results.
+Overall, the SBOM readiness report adopts an organiza-
+tional perspective (e.g., industry-wide challenges and oppor-
+tunities) while our study focuses on SBOM practitioners’
+perspectives and offers a more fine-grained investigation.
+Specifically, this study broadens and deepens the SBOM
+readiness report mainly from 9 SBOM-related aspects: ben-
+efits, adoption, generation, distribution, integrity, vulnerability
+management, tooling, concerns, and AIBOM (See Table IV).
+C. Threats to validity
+The number of survey participants may pose a threat to
+validity. However, considering the relative novelty of SBOM
+and the lack of SBOM adoption, we made our best effort and
+included participants from different backgrounds. To minimize
+the impact of limited SBOM understanding, we provided the
+2639
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+TABLE IV
+SBOM READINESS REPORT V. S . THIS PAPER
+Topics SBOM readiness report This paper
+Benefits 16 specific benefits of SBOMs (10 for producing and 6 for
+consuming SBOMs), all enabled by transparency.
+Transparency, and subsequently enabled accountability, traceability, and
+security. (Finding 1)
+Adoption 90% surveyed organizations have started SBOM journey;
+47% are using (i.e., producing/consuming) SBOMs.
+SBOM adoption is worrying: limited generation & more limited consumption.
+(Findings 1, 2, 10)
+Generation
+a) SBOMs can be generated at different SDLC stages.
+b) More organizations favor including more than baseline
+SBOM information.
+a) SBOMs can be generated at different SDLC stages but practitioners expect
+“dynamic” SBOM generation throughout SDLC (Finding 3).
+b) SBOM-included data fields need further standardization (Finding 4).
+Distribution N/A Secure yet flexible SBOM distribution mechanisms are needed. (Finding 5)
+Integrity N/A SBOM integrity assurances are needed against tampering threats. (Finding 6)
+Vulnerability SBOMs should reflect vulnerability information.
+a) Organizations may not want to share sensitive (vulnerability) data
+(Finding 5).
+b) Mechanisms are needed to communicate vulnerabilities with limited/
+undetermined exploitability (Finding 7).
+Tooling Limited availability of SBOM tooling Affirmed necessity but limited availability, usability, and integrity of SBOM
+tooling. (Finding 8)
+Concerns
+4 shared concerns for production & consumption: industry
+commitment, data fields consensus, value of SBOMs,
+tooling availability. 2 additional concerns for production:
+information privacy, correctness.
+Explicitly identifies 3 major concerns but covers more throughout
+a) Standard formats’ lack of extensibility (Finding 9).
+b) SBOM information sensitivity & privacy (Finding 5).
+c) Adoption and education deficiency (Finding 10).
+AIBOM N/A AIBOM should also include AI/ML-specific data. (Section IV-A8)
+option for respondents to skip the survey if they are not
+familiar with SBOMs. Despite these measures, it’s possible
+that the collected responses may not accurately reflect the
+participants’ beliefs. This is a common and acceptable threat
+to validity in similar studies, which assume that the majority
+of responses are truthful.
+VI. R ELATED WORK
+On the one hand, there has been work on SSC security.
+For instance, Ohm et al. [4] summarized 174 OSS packages
+used for real-world malicious SSC attacks. Blockchain has
+been applied to SSC security (e.g., [32]–[34]. Especially,
+Marjanovi´c et al. [35] used blockchain-based techniques to
+record the software composition details. On the other hand,
+there are limited scholarly papers on SBOMs. Martin et al. [20]
+introduced the concept of the SBOM and listed nine possible
+use scenarios. In 2021, Carmody et al. [36] presented a high-
+level overview of how SBOMs help build resilient medical
+SSCs. They illustrated the benefits of SBOMs for software pro-
+ducers, consumers and regulators, as well as relevant progress
+on SBOMs. Back in 2019, Barclay et al. [37] introduced their
+ideas on applying BOMs to data ecosystems for transparency
+and traceability, where they detailed a conceptual model to
+combine a BOM (static) and a bill of lots (dynamic) to jointly
+record the static data components and the dynamic data of
+a specific experiment. Based on their previous work, Barclay
+et al. [38] recently introduced their work using a BOM as a
+verifiable credential for transparency into the AI SSCs, which
+is a step towards AIBOM.
+In recent years, there have been numerous studies related
+to SBOMs, such as software composition analysis (SCA),
+release engineering, and reproducible builds. For example,
+Imtiaz et al. [39] compared various SCA tools for vulnerability
+reporting, and Ombredanne et al. [40] reviewed SCA tools for
+license compliance. The application of SCA in the automotive
+industry was discussed by Kengo Oka et al. [41], and Mackey
+et al. [42] explored integrating automated SCA into DevOps
+processes. In the area of release engineering, Openja et al. [43]
+studied modern release engineering topics and challenges on
+StackOverflow, while Laukkanen et al. [44] compared release
+engineering practices between a mature company and a startup.
+Bi et al. [45] investigated the production and use of release
+notes. Lastly, the production of verifiable builds was explored
+in works such as [46]–[48].
+VII. CONCLUSION AND FUTURE WORK
+SBOMs are essential to SSC security considering the trans-
+parency enabled by SBOMs and the subsequently enhanced
+accountability, traceability and security. In this study, we inter-
+viewed 17 and surveyed 65 SBOM practitioners on their per-
+ception of SBOMs. Despite the promising SSC transparency
+and security enabled by SBOMs, there are still open challenges
+to be addressed. To accelerate the adoption of SBOMs, higher-
+quality SBOM generation, clearer benefits and use cases in
+SBOM consumption, and lower barriers in SBOM sharing
+are prerequisites which need to be further studied, mitigated
+and addressed. In addition, SBOMs for AI software (i.e.,
+AIBOM) are an inevitable trend given the popularity of AI
+applications, and AIBOMs need to consider the co-evolution
+of data/model/code/configuration.
+A CKNOWLEDGMENT
+The authors would like to sincerely thank all the interview
+and survey participants for their help and support. This work
+could never have been completed without them.
+2640
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+R EFERENCES
+[1] NTIA, “Framing Software Component Transparency: Establishing a
+Common Software Bill of Material (SBOM).” [Online]. Available:
+https://ntia.gov/files/ntia/publications/framingsbom 20191112.pdf
+[2] Wikipedia contributors, “Solarwinds — Wikipedia, the free encyclo-
+pedia,” https://en.wikipedia.org/w/index.php?title=SolarWinds&oldid=
+1104117684, 2022, [Online; accessed 25-August-2022].
+[3] Sonatype, “The 2021 State of the Software Supply Chain Report.”
+[Online]. Available: https://www.sonatype.com/resources/state-of-the-
+software-supply-chain-2021
+[4] M. Ohm, H. Plate, A. Sykosch, and M. Meier, “Backstabber’s knife
+collection: A review of open source software supply chain attacks,” in
+International Conference on Detection of Intrusions and Malware, and
+Vulnerability Assessment. Springer, 2020, pp. 23–43.
+[5] “The State of Software Bill of Materials (SBOM) and Cybersecurity
+Readiness.” [Online]. Available: https://www.linuxfoundation.org/
+tools/the- state- of- software- bill- of- materials- sbom- and- cybersecurity-
+readiness/
+[6] A. Singh, R. Bansal, and N. Jha, “Open source software vs proprietary
+software,” International Journal of Computer Applications, vol. 114,
+no. 18, 2015.
+[7] NTIA, “The Minimum Elements For a Software Bill of Materials
+(SBOM).” [Online]. Available: https://www.ntia.doc.gov/files/ntia/
+publications/sbom minimum elements report.pdf
+[8] Gartner Research, “Innovation Insight for SBOMs.” [Online]. Available:
+https://www.gartner.com/en/documents/4011501
+[9] J. Jiao, M. M. Tseng, Q. Ma, and Y. Zou, “Generic bill-of-materials-
+and-operations for high-variety production management,” Concurrent
+Engineering, vol. 8, no. 4, pp. 297–321, 2000.
+[10] Google Cloud, “Delivering software securely.” [Online]. Available: https:
+//cloud.google.com/resources/delivering-software-securely-whitepaper
+[11] B. Bensing, “History of the Software Bill of Materials (SBOM).”
+[Online]. Available: https://billbensing.com/software- supply- chain/
+history-software-bill-of-material-sbom/
+[12] “Executive Order on Improving the Nation’s Cybersecurity,” May
+2021. [Online]. Available: https://www.whitehouse.gov/briefing-
+room/presidential- actions/2021/05/12/executive- order- on- improving-
+the-nations-cybersecurity/
+[13] E-SPIN, “The Evolution of Software Composition Analysis (SCA),”
+https://www.e- spincorp.com/the- evolution- of- software- composition-
+analysissca/, 2018, [Online; accessed 25-August-2022].
+[14] S. Easterbrook, J. Singer, M.-A. Storey, and D. Damian, “Selecting
+empirical methods for software engineering research,” in Guide to
+advanced empirical software engineering. Springer, 2008, pp. 285–
+311.
+[15] J. A. Smith, “Qualitative psychology: A practical guide to research
+methods,” Qualitative psychology, pp. 1–312, 2015.
+[16] T. Bi, X. Xia, D. Lo, J. Grundy, T. Zimmermann, and D. Ford,
+“Accessibility in software practice: A practitioner’s perspective,” ACM
+Transactions on Software Engineering and Methodology (TOSEM),
+vol. 31, no. 4, pp. 1–26, 2022.
+[17] J. Cohen, “A coefficient of agreement for nominal scales,” Educational
+and psychological measurement, vol. 20, no. 1, pp. 37–46, 1960.
+[18] B. A. Kitchenham and S. L. Pfleeger, “Personal opinion surveys,” in
+Guide to advanced empirical software engineering. Springer, 2008,
+pp. 63–92.
+[19] X. Hu, X. Xia, D. Lo, Z. Wan, Q. Chen, and T. Zimmermann,
+“Practitioners’ expectations on automated code comment generation,”
+in Proceedings of the 44th International Conference on Software
+Engineering, ser. ICSE ’22. New York, NY, USA: Association
+for Computing Machinery, 2022, p. 1693–1705. [Online]. Available:
+https://doi.org/10.1145/3510003.3510152
+[20] R. A. Martin, “Visibility & control: Addressing supply chain challenges
+to trustworthy software-enabled things,” in 2020 IEEE Systems Security
+Symposium (SSS), 2020, pp. 1–4.
+[21] J. Yin, M. Tang, J. Cao, and H. Wang, “Apply transfer learning
+to cybersecurity: Predicting exploitability of vulnerabilities by
+description,” Knowledge-Based Systems, vol. 210, p. 106529, 2020.
+[Online]. Available: https://www.sciencedirect.com/science/article/pii/
+S0950705120306584
+[22] CISA, “Vulnerability Exploitability eXchange (VEX) - Status Justifica-
+tions,” p. 13, 2022.
+[23] NTIA, “Sharing and Exchanging SBOMs.” [Online]. Available: https:
+//www.ntia.doc.gov/files/ntia/publications/ntia sbom framing sharing
+july9.pdf
+[24] A. A. Younis, Y. K. Malaiya, and I. Ray, “Using attack surface
+entry points and reachability analysis to assess the risk of software
+vulnerability exploitability,” in 2014 IEEE 15th International Symposium
+on High-Assurance Systems Engineering, 2014, pp. 1–8.
+[25] B. Slava, “The end goal for SBOMs - lessons
+learned from parallel cybersecurity markets | LinkedIn.”
+[Online]. Available: https://www.linkedin.com/pulse/end-goal-sboms-
+lessons - learned - from - parallel - markets - slava - bronfman/?trackingId =
+L48%2BvRWJfddIMba1jDSHNQ%3D%3D
+[26] Q. Lu, L. Zhu, X. Xu, J. Whittle, and Z. Xing, “Towards a Roadmap
+on Software Engineering for Responsible AI,” in 2022 IEEE/ACM 1st
+International Conference on AI Engineering – Software Engineering for
+AI (CAIN), 2022, pp. 101–112.
+[27] I. Barclay, A. Preece, I. Taylor, S. K. Radha, and J. Nabrzyski,
+“Providing assurance and scrutability on shared data and machine
+learning models with verifiable credentials,” Concurrency and
+Computation: Practice and Experience, vol. n/a, no. n/a, p. e6997,
+eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpe.6997. [On-
+line]. Available: https://onlinelibrary.wiley.com/doi/abs/10.1002/
+cpe.6997
+[28] R. N. Rajapakse, M. Zahedi, M. A. Babar, and H. Shen, “Challenges and
+solutions when adopting DevSecOps: A systematic review,” Information
+and Software Technology, vol. 141, p. 106700, 2022. [Online]. Available:
+https://www.sciencedirect.com/science/article/pii/S0950584921001543
+[29] W. Martin, “Automated Rapid Certification Of Software.”
+[Online]. Available: https://www.darpa.mil/program/automated-rapid-
+certification-of-software
+[30] “Sbom Myths vs. Facts.” [Online]. Available: https://www.ntia.gov/
+files/ntia/publications/sbom myths vs facts nov2021.pdf
+[31] Rezilion, “Dynamic SBOM: A Comprehensive Guide,” https : / /
+www.rezilion.com/blog/dynamic-sbom-a-comprehensive-guide/, 2022,
+[Online; accessed 31-August-2022].
+[32] M. Mylrea and S. N. G. Gourisetti, “Blockchain for supply chain
+cybersecurity, optimization and compliance,” in 2018 Resilience Week
+(RWS), 2018, pp. 70–76.
+[33] E. Bandara, S. Shetty, A. Rahman, and R. Mukkamala, “Let’strace
+— blockchain, federated learning and tuf/in-toto enabled cyber supply
+chain provenance platform,” in MILCOM 2021 - 2021 IEEE Military
+Communications Conference (MILCOM), 2021, pp. 470–476.
+[34] H. Zhang, T. Nakamura, and K. Sakurai, “Security and trust issues
+on digital supply chain,” in 2019 IEEE Intl Conf on Dependable,
+Autonomic and Secure Computing, Intl Conf on Pervasive Intelligence
+and Computing, Intl Conf on Cloud and Big Data Computing, Intl Conf
+on Cyber Science and Technology Congress (DASC/PiCom/CBDCom/-
+CyberSciTech), 2019, pp. 338–343.
+[35] J. Marjanovi´c, N. Dalˇcekovi´c, and G. Sladi´c, “Improving critical infras-
+tructure protection by enhancing software acquisition process through
+blockchain,” in 7th Conference on the Engineering of Computer Based
+Systems, 2021, pp. 1–7.
+[36] S. Carmody, A. Coravos, G. Fahs, A. Hatch, J. Medina, B. Woods, and
+J. Corman, “Building resilient medical technology supply chains with a
+software bill of materials,” npj Digital Medicine, vol. 4, no. 1, pp. 1–6,
+Feb. 2021, number: 1 Publisher: Nature Publishing Group. [Online].
+Available: https://www.nature.com/articles/s41746-021-00403-w
+[37] I. Barclay, A. Preece, I. Taylor, and D. Verma, “Towards traceability
+in data ecosystems using a bill of materials model,” arXiv preprint
+arXiv:1904.04253, 2019.
+[38] I. Barclay, A. Preece, I. Taylor, S. K. Radha, and J. Nabrzyski, “Pro-
+viding assurance and scrutability on shared data and machine learning
+models with verifiable credentials,” Concurrency and Computation:
+Practice and Experience, p. e6997, 2022.
+[39] N. Imtiaz, S. Thorn, and L. Williams, “A comparative study of
+vulnerability reporting by software composition analysis tools,” in
+Proceedings of the 15th ACM / IEEE International Symposium on
+Empirical Software Engineering and Measurement (ESEM), ser. ESEM
+’21. New York, NY, USA: Association for Computing Machinery,
+2021. [Online]. Available: https://doi.org/10.1145/3475716.3475769
+[40] P. Ombredanne, “Free and open source software license compliance:
+Tools for software composition analysis,” Computer, vol. 53, no. 10,
+pp. 105–109, 2020.
+2641
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
+[41] D. Kengo Oka, Software Composition Analysis in the Automotive
+Industry. Wiley, 2021, pp. 91–110. [Online]. Available: https:
+//ieeexplore.ieee.org/document/9821841
+[42] T. Mackey, “Building open source security into agile application builds,”
+Network Security, vol. 2018, no. 4, pp. 5–8, 2018.
+[43] M. Openja, B. Adams, and F. Khomh, “Analysis of modern release
+engineering topics : – a large-scale study using stackoverflow –,” in 2020
+IEEE International Conference on Software Maintenance and Evolution
+(ICSME), Sep. 2020, pp. 104–114.
+[44] E. Laukkanen, M. Paasivaara, J. Itkonen, and C. Lassenius, “Comparison
+of release engineering practices in a large mature company and a
+startup,” Empirical Software Engineering, vol. 23, no. 6, pp. 3535–3577,
+2018.
+[45] T. Bi, X. Xia, D. Lo, J. Grundy, and T. Zimmermann, “An empirical
+study of release note production and usage in practice,” IEEE Transac-
+tions on Software Engineering, vol. 48, no. 6, pp. 1834–1852, 2020.
+[46] Y. Shi, M. Wen, F. R. Cogo, B. Chen, and Z. M. Jiang, “An experi-
+ence report on producing verifiable builds for large-scale commercial
+systems,” IEEE Transactions on Software Engineering, vol. 48, no. 9,
+pp. 3361–3377, Sep. 2022.
+[47] J. Xiong, Y. Shi, B. Chen, F. R. Cogo, and Z. M. J. Jiang,
+“Towards build verifiability for java-based systems,” in Proceedings of
+the 44th International Conference on Software Engineering: Software
+Engineering in Practice, ser. ICSE-SEIP ’22. New York, NY, USA:
+Association for Computing Machinery, 2022, p. 297–306. [Online].
+Available: https://doi.org/10.1145/3510457.3513050
+[48] Z. Ren, S. Sun, J. Xuan, X. Li, Z. Zhou, and H. Jiang, “Automated
+patching for unreproducible builds,” in Proceedings of the 44th
+International Conference on Software Engineering, ser. ICSE ’22.
+New York, NY, USA: Association for Computing Machinery, 2022, p.
+200–211. [Online]. Available: https://doi.org/10.1145/3510003.3510102
+2642
+Authorized licensed use limited to: Innopolis University. Downloaded on March 22,2026 at 13:51:13 UTC from IEEE Xplore. Restrictions apply.
