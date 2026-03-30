@@ -1,0 +1,10 @@
+
+SBOM tool accuracy critically affects software supply chain security. Benedetti et al. [1] compared five tools on Python packages. They found significant performance variations. Haigitler and Merli [3] evaluated tools across four languages. They concluded no single tool fulfilled all requirements. Rabbi et al. [4] assessed JavaScript ecosystems. They reported missing dependency identification in some tools. Imtiaz et al. [2] compared nine SCA tools. They found widely varying vulnerability counts.
+
+Benedetti et al. [1] reported baseline tools generated ten times more false positives. Ponta et al. [11] and [13] demonstrated metadata-based detection produced substantial errors. Their code-centric approach improved accuracy but covered only Java. Pashchenko et al. [10] found 20% of vulnerable dependencies remained undeployed. Traditional methods over-inflated risk counts.
+
+ Stalnaker et al. [5] surveyed practitioners. They identified poor SBOM quality as a major challenge. Xia et al. [6] interviewed developers. They concluded SBOM validation requires standardization. Ecosystem complexity compounds these issues. Zimmermann et al. [12] analyzed npm packages. They found extensive transitive dependencies. Decan et al. [15] compared seven ecosystems. They reported exponential dependency growth in npm and CRAN, while other ecosystems showed linear patterns.
+
+Thirumalaisamy [8] described SBOM drift in dynamic environments. However, empirical version-longitudinal data are absent. Multiple cross-sectional studies evaluated tools at fixed points in time [1][2][3][4] without examining version-to-version performance changes. Kağızmandere and Arslan [7] integrated SBOM generation into CI/CD pipelines but did not assess tool version evolution. No study tracked accuracy changes across tool releases.
+
+This research fills that gap. We will track Syft, Trivy, and cdxgen across four major versions. We will assess completeness changes over time. We will identify regressions between releases. This longitudinal approach addresses practitioner needs for version-informed tool selection [2][5][6].

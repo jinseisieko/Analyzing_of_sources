@@ -2114,3 +2114,262 @@ Authors: Alexandre Decan, Tom Mens, Philippe Grosjean
 **⚠️ Ambiguity Flag:** The article states both that "the number of package updates either remains stable or tends to grow over time" (Section 5) and that required packages are updated "significantly more often" than non-required packages. These are not contradictory but operate at different analytical levels (ecosystem-level trends vs. package-level comparisons); both quotations are retained for accuracy.
 
 **⚠️ Certainty Distinction:** Claims about causal explanations for observed differences (e.g., CRAN's policy, JavaScript's standard library) are consistently qualified by authors with hedging language: "very likely due to," "could be explained by," "we hypothesize," "we assume." These formulations have been preserved in the quotations above to accurately represent the authors' degree of certainty.
+
+# [14] Perspectives on the SolarWinds Incident
+Authors:
+Sean Peisert | Lawrence Berkeley National Laboratory and University of California, Davis
+Bruce Schneier | Harvard University
+Hamed Okhravi | MIT Lincoln Laboratory
+Fabio Massacci | University of Trento and Vrije Universiteit Amsterdam
+Terry Benzel | USC Information Sciences Institute
+Carl Landwehr | University of Michigan
+Mohammad Mannan | Concordia University
+Jelena Mirkovic | University of Southern California Information Sciences Institute
+Atul Prakash | University of Michigan
+James Bret Michael | Naval Postgraduate School
+
+## Analysis of "Perspectives on the SolarWinds Incident" (IEEE Security & Privacy, March/April 2021)
+
+### 1. Key Quantitative Results
+
+*   **Fact:** The malicious SolarWinds Orion update was installed by thousands of customers globally, including U.S. federal agencies.
+    > *"it is reported by SolarWinds that the update containing the malware was installed by thousands of customers, including numerous U.S. federal agencies and businesses around the world."*  
+    > 📍 *Location: p. 7, introductory paragraph*
+
+*   **Fact:** FireEye was among the first organizations publicly reported as compromised by the SolarWinds malware.
+    > *"The cybersecurity company FireEye was among the first reported to be actually compromised by the malware."*  
+    > 📍 *Location: p. 7, introductory paragraph*
+
+*   **Fact:** Of approximately 300,000 SolarWinds customers, only a relatively small subset actually uploaded the compromised updates.
+    > *"Of the 300,000 customers(granted, not all use the Orion software or were still licensed to do so), a relatively small number of customers actually uploaded the updates."*  
+    > 📍 *Location: p. 11, James Bret Michael perspective, para. 2*
+
+*   **Fact:** The vulnerable SolarWinds platform comprises 18 affected subproducts and 40+ unaffected subproducts.
+    > *"A simple investigation on the company's FAQ page shows that the 'vulnerable platform' is, in reality, a patchwork of services: 18(sub)products are, indeed, affected by the vulnerabilities(from Access Management, to Web Performance Monitor, to Log Analyzer—which was recently acquired); another 40+(sub)products are not affected."*  
+    > 📍 *Location: p. 9, Fabio Massacci perspective, para. 1*
+
+### 2. Qualitative Conclusions and Interpretations
+
+*   **Conclusion:** Market incentives do not reward software security, leading companies like SolarWinds to underspend on security for short-term profitability.
+    > *"The market doesn't reward safety and security—especially when the effects of ignoring those things are long term and diffuse. The market rewards short-term profits at the expense of safety and security."*  
+    > 📍 *Location: p. 8, Bruce Schneier perspective, para. 4*
+
+*   **Conclusion:** SolarWinds' ownership by a private-equity firm focused on cost-cutting contributed to inadequate security investment.
+    > *"The company is owned by Thoma Bravo partners, a private-equity firm known for radical cost-cutting in the name of short-term profit. Under CEO Kevin Thompson, the company underspent on security even as it outsourced software development."*  
+    > 📍 *Location: p. 8, Bruce Schneier perspective, para. 3*
+
+*   **Conclusion:** Additive security paradigms (adding tools) inherently expand attack surfaces, creating a tradeoff not quantitatively understood by the security community.
+    > *"Every new tool, while it might reduce parts of the attack surface, also adds a new attack surface: vulnerabilities in the tool itself become a new possible vector of compromise for the system. [...] We, as a community, do not have a proper, quantitative understanding of this tradeoff"*  
+    > 📍 *Location: p. 9, Hamed Okhravi perspective, para. 2-3*
+
+*   **Conclusion:** Software supply-chain attacks are at least as important as hardware supply-chain attacks and will likely become more prominent due to software complexity and low cost of inserting malicious logic.
+    > *"software supply-chain attacks are as important—if not more important—than hardware supply-chain attacks. Because of the vast complexity of modern software and the comparatively low cost of introducing malicious logic into the code, this threat vector can be expected to become more prominent over the next few years."*  
+    > 📍 *Location: p. 9, Hamed Okhravi perspective, para. 4*
+
+*   **Conclusion:** Traditional security mechanisms (code signing, digital certificates, secure update delivery) have limited impact against supply-chain attacks where malicious code is introduced at the source level.
+    > *"The traditional security mechanisms that are developed to ward off malicious 'outside' code, such as code signing, digital certificates, secure update delivery mechanisms, transport security, and so on, have little impact on this threat vector, as evidenced by the SolarWinds hack."*  
+    > 📍 *Location: p. 9, Hamed Okhravi perspective, para. 4*
+
+*   **Conclusion:** Modern software ecosystems involve complex dependencies (fourth- to sixteenth-party software) where neither end users nor vendors have clear visibility into what is being installed.
+    > *"This is not about third-party software; it is about fourth- or eighth-or 16th-party software. We don't know what we are installing, and even the people who sell it to us have no clear idea."*  
+    > 📍 *Location: p. 9, Fabio Massacci perspective, bullet point 1*
+
+*   **Conclusion:** Security mechanisms like Single Sign-On (SSO), designed for first-party products, can become liabilities when applied to complex, multi-vendor software patchworks.
+    > *"Several security mechanisms(like SSO) that we conceived to be used with first-party products(which are secured as first-party products) can be damning in the new world order, as you SSO into something you have no idea about."*  
+    > 📍 *Location: p. 9, Fabio Massacci perspective, bullet point 3*
+
+*   **Conclusion:** The SolarWinds attack was well-planned and executed, involving subtle code changes using existing coding styles, a two-week dormancy period post-infection, and credential exfiltration via protocol mimicry.
+    > *"the changes in code were done at the source code level over months and possibly by an insider. The changes were subtle, using coding styles and naming conventions that were already in the code. [...] After infection, the code was dormant for two weeks. After that, it mimicked another known protocol to exfiltrate credentials."*  
+    > 📍 *Location: p. 11, Jelena Mirkovic perspective, para. 1*
+
+*   **Conclusion:** Two critical weak links exploited were: (1) insiders in software/hardware production companies, and (2) monitoring software installed pre-encryption that could access credentials.
+    > *"In my opinion, there were two weak links that the attack exploited: insiders in the companies producing software/hardware and installing monitoring software that precedes encryption(otherwise, credentials could not be stolen)."*  
+    > 📍 *Location: p. 11, Jelena Mirkovic perspective, para. 2*
+
+*   **Conclusion:** Reliance on public cloud infrastructure for command-and-control servers complicates detection, as traffic to major cloud providers may not appear suspicious.
+    > *"command and control servers were hosted on public clouds(Microsoft and Amazon), which may not have looked suspicious. Therefore, the third weak link is our reliance on clouds and allowing organizations with high confidentiality requirements to communicate with public clouds."*  
+    > 📍 *Location: p. 11, Jelena Mirkovic perspective, para. 3*
+
+*   **Conclusion:** Establishing liability for software developers who fail to follow best practices in update release could improve software system resilience, with relief available for those demonstrating compliance.
+    > *"Establishing liability requires policy action, but perhaps the severity of the Solar Winds compromise can provide sufficient political will to help the software industry begin to assume responsibility for its products."*  
+    > 📍 *Location: p. 10, Carl Landwehr perspective, final paragraph*
+
+*   **Conclusion:** Security products should be treated as a distinct software category with standards requiring them to "fail gracefully" without reducing the protected system's security baseline.
+    > *"Security products should do no harm. They should be designed with failure in mind—i.e., they must fail gracefully, without reducing the security level of the protected system compared to the original state(without the product itself)."*  
+    > 📍 *Location: p. 10, Mohammad Mannan perspective, bullet point 1*
+
+*   **Conclusion:** Addressing advanced attacker Tactics, Techniques, and Procedures (TTPs) requires improved communication between offensive and defensive security teams.
+    > *"Addressing TTPs requires better communications between the offensive and defensive sides of the house."*  
+    > 📍 *Location: p. 12, James Bret Michael perspective, para. 5*
+
+### 3. Methodological Details for Reproducibility
+
+*   **Parameter:** Proposed two-part solution for improving software security: (1) enhanced government procurement evaluating security practices, and (2) regulatory minimum security standards for critical network software.
+    > *"The solution here is twofold. The first is to improve government software procurement. [...] If these evaluations are made public, along with the list of companies that meet them, all network buyers can benefit from them. [...] The government needs to set minimum security standards for software that's used in critical network applications, just as it sets software standards for avionics."*  
+    > 📍 *Location: p. 8-9, Bruce Schneier perspective, para. 5-6*
+
+*   **Parameter:** Proposed "reductive security" paradigm as an alternative to additive approaches: removing unnecessary services, libraries, and features to shrink attack surfaces.
+    > *"This also highlights the need for another paradigm that requires more attention in the community: 'reductive' security, or making a system more secure by removing its unnecessary services, libraries, features, and so on, thereby shrinking its attack surface."*  
+    > 📍 *Location: p. 9, Hamed Okhravi perspective, para. 3*
+
+*   **Parameter:** Proposed technical approach: tools enabling consumers to perform deeper security analysis on signed updates beyond signature verification, building on STONESOUP and Cyber Grand Challenge technologies.
+    > *"What if the consumer could run checks on the signed update to check it for vulnerabilities? This is the approach taken by the Securely Taking on New Executable Software of Uncertain Provenance(STONESOUP) program at Intelligence Advanced Research Projects Activity in 2009. [...] Considerable technology has been developed by STONESOUP and subsequent programs, including DARPA's Cyber Grand Challenge, that demonstrates the ability to perform significant automated analyses on both source code and binaries to expose potential vulnerabilities(and, in some cases, even to remove them). This technology is commercially available."*  
+    > 📍 *Location: p. 10, Carl Landwehr perspective, para. 2-3*
+
+*   **Parameter:** Proposed policy mechanism: liability framework with fines per new CVE for security products, with loss of "security" label after threshold exceeded.
+    > *"Instead of requiring an abuse to happen to trigger penalties, another avenue could be to incur a certain amount of fine for each new CVE, and after a certain threshold, the product or company may lose their 'security' label."*  
+    > 📍 *Location: p. 10-11, Mohammad Mannan perspective, final bullet point*
+
+*   **Parameter:** Proposed multi-timeframe security approach: near-term (cloud hypervisors pushing security), mid-term (zero-trust architectures), long-term (quantum-based approaches).
+    > *"The way forward may be to take a fundamentally new approach to security in the near-(e.g., cloud hypervisors pushing security rather than individual customers patching—or not), mid-(e.g., zero-trust, or something like it), and long-term(e.g., quantum-based approaches)."*  
+    > 📍 *Location: p. 12, James Bret Michael perspective, para. 6*
+
+### 4. Limitations and Future Directions
+
+*   **Limitation:** Automated vulnerability analysis tools cannot guarantee complete absence of vulnerabilities, only raise the bar for attackers.
+    > *"Of course, this approach will never ensure there are no vulnerabilities, but it could raise the bar substantially."*  
+    > 📍 *Location: p. 10, Carl Landwehr perspective, para. 2*
+
+*   **Limitation:** Insider threats in software production are acknowledged as impossible to fully eliminate.
+    > *"The first [weak link] is impossible to eliminate."*  
+    > 📍 *Location: p. 11, Jelena Mirkovic perspective, para. 2*
+
+*   **Limitation:** Tension exists between comprehensive system monitoring and protecting credential privacy; resolving this may require accepting tradeoffs.
+    > *"The second—perhaps, but there will always be tension between the desire to monitor everything and protecting privacy(in this case, the privacy of credentials that were later used to compromise the security of data)."*  
+    > 📍 *Location: p. 11, Jelena Mirkovic perspective, para. 2*
+
+*   **Limitation:** Damage assessment for SolarWinds will likely take months due to the incident's scale and the number of investigating organizations.
+    > *"Damage assessment will likely take months to accomplish, given the reach of SolarWinds (i.e., the number of customers and, through transitivity, other parties affected) and the large number of organizations(e.g., the U.S. Federal Bureau of Investigation, the United States Cyber Command, and security firms) involved in the investigations of SolarWinds."*  
+    > 📍 *Location: p. 11, James Bret Michael perspective, para. 1*
+
+*   **Limitation:** Governments have been "somewhat ineffectual" in addressing supply-chain security issues and lack workable solutions or strong leadership in this arena.
+    > *"Governments have been somewhat ineffectual in handling supply-chain issues. They complain a lot but don't seem to have workable solutions or good leadership in the supply-chain arena."*  
+    > 📍 *Location: p. 11, James Bret Michael perspective, para. 3*
+
+*   **Limitation:** The proposed suggestions for security product standards and liability are acknowledged as incomplete and requiring more serious consideration.
+    > *"Of course, these suggestions here are incomplete and need more serious consideration."*  
+    > 📍 *Location: p. 11, Mohammad Mannan perspective, final paragraph*
+
+*   **Flagged Ambiguity:** The article presents multiple perspectives on whether the SolarWinds incident represents a fundamentally novel threat or a well-understood attack pattern executed at scale. Both viewpoints are supported by quotes:
+    *   Novelty perspective: *"The SolarWinds hacks are not novel or unique. Software Trojans and supply-chain attacks have been understood in the community for many decades"* (p. 8, Hamed Okhravi)
+    *   Scale/impact perspective: *"I don't see anything new here in SolarWinds. It is just that a lot of people are embarrassed (including top cybersecurity firms), and the media is having a field day."* (p. 11-12, James Bret Michael)
+    > 📍 *Location: p. 8 and p. 11-12, respective author perspectives*
+
+---
+**Note on Document Type:** This article is a perspectives/opinion piece featuring editorial board commentary rather than an empirical research study. Consequently, extracted "facts" represent the authors' expert analyses, proposed frameworks, and policy recommendations rather than experimentally verified results. All extractions are strictly limited to claims made within the provided text with accompanying verbatim quotes as required.
+
+# [9] Building resilient medical technology supply chains with a software bill of materials
+Authors:Seth Carmody 1,2
+, Andrea Coravos 3,4,5 , Ginny Fahs 7,8 ✉, Audra Hatch 8,9
+, Janine Medina 5,6,8,10 , Beau Woods 5,8,11 and
+Joshua Corman
+
+## Analysis of "Building resilient medical technology supply chains with a software bill of materials" (npj Digital Medicine, 2021)
+
+---
+
+## 1. Key Quantitative Results
+
+*   **Fact:** A 2017 audit found that 96% of commercial software products include third-party software components.
+    > *"A 2017 audit and analysis of over 1100 commercial, cross-sector codebases found that 96% of software products included third-party software components such as commercial off-the-shelf components, modules, and libraries from both open-source and commercial third-party suppliers"*  
+    > 📍 *Location: Introduction, para. 3*
+
+*   **Fact:** The WannaCry ransomware attack in May 2017 infected 200,000 computers across hospital systems in 150 countries.
+    > *"the WannaCry attack in May 2017 infected 200,000 computers in hospital systems across 150 countries"*  
+    > 📍 *Location: Introduction, para. 4*
+
+*   **Fact:** A patch for the Windows vulnerability exploited by WannaCry had been issued two months prior to the attack.
+    > *"These exploits leveraged a vulnerability in several versions of Microsoft Windows for which a patch had been issued in March 2017, 2 months prior to the attack"*  
+    > 📍 *Location: Introduction, para. 4*
+
+*   **Fact:** Approximately 1% of UK NHS devices were impacted by the WannaCry attack.
+    > *"including approximately 1% of UK NHS devices impacted by WannaCry"*  
+    > 📍 *Location: Introduction, para. 4*
+
+*   **Fact:** The WannaCry attack impacted healthcare delivery in over one-third of UK NHS trusts.
+    > *"the WannaCry ransomware attack impacted healthcare delivery in over a third of the United Kingdom's National Health System(NHS) trusts"*  
+    > 📍 *Location: Introduction, para. 2*
+
+---
+
+## 2. Qualitative Conclusions and Interpretations
+
+*   **Conclusion:** SBOMs function as a transparency mechanism analogous to food ingredient lists, enabling identification of software components for vulnerability management.
+    > *"Analogous to an ingredients list on food packaging, an SBOM is a list of all included software components. SBOMs provide a transparency mechanism for securing software product supply chains by enabling faster identification and remediation of vulnerabilities, towards the goal of reducing the feasibility of attacks"*  
+    > 📍 *Location: Abstract*
+
+*   **Conclusion:** SBOMs can benefit all medical technology supply chain stakeholders without significantly increasing software production costs.
+    > *"SBOMs have the potential to benefit all supply chain stakeholders of medical technologies without significantly increasing software production costs"*  
+    > 📍 *Location: Abstract*
+
+*   **Conclusion:** For software builders, SBOMs streamline maintenance by clarifying component inventory and enabling removal of unneeded components to reduce attack surface.
+    > *"An SBOM can make the task of understanding what is included in the build, and therefore what needs maintenance, a more routine process for builders and other supply-chain stakeholders. Removing unneeded components in the final product is also a best practice that reduces the 'attack surface' of the application"*  
+    > 📍 *Location: "For the builder" subsection*
+
+*   **Conclusion:** For buyers, SBOMs enable risk evaluation at purchase by allowing matching of component versions to known vulnerability databases.
+    > *"For buyers, an SBOM helps evaluate risk at the time of purchase of a builder's product... An SBOM reveals individual software component versions that can then be matched to publicly known vulnerabilities, such as those listed in the National Vulnerability Database(nvd.nist.gov)"*  
+    > 📍 *Location: "For the buyer" subsection*
+
+*   **Conclusion:** For operators, SBOMs support proactive security by enabling rapid triage of newly discovered vulnerabilities without costly point-in-time assessments.
+    > *"For rapid triage, an up-to-date set of SBOMs can be safely, easily, quickly, and inexpensively mined to understand if and how an organization is impacted by a newly discovered vulnerability"*  
+    > 📍 *Location: "For operators" subsection*
+
+*   **Conclusion:** For regulators, SBOMs enable systemic risk analysis across products, companies, and hospitals that would not be apparent within a single entity's scope.
+    > *"Analysis of SBOMs across products, companies, and hospitals can reveal and assist in managing systemic risk that would not be apparent within the scope of a single entity"*  
+    > 📍 *Location: "For regulators" subsection*
+
+*   **Conclusion:** Widespread SBOM adoption could enable earlier vulnerability identification, shorter remediation time, and heightened awareness of outbreak effects.
+    > *"Widespread adoption of SBOM could allow for earlier identification of software vulnerabilities, shorter time to remediation, and heightened awareness of outbreaks and their effects"*  
+    > 📍 *Location: "THE PATH FORWARD" section*
+
+---
+
+## 3. Methodological Details for Reproducibility
+
+*   **Parameter:** The article identifies four primary stakeholder roles in the software supply chain ecosystem relevant to SBOM implementation.
+    > *"These stakeholder roles include the builder(developer/manufacturer), buyer(customer), operator(hospital, doctor, and patient), and regulator of software products"*  
+    > 📍 *Location: "THE ROLE OF SOFTWARE BILL OF MATERIALS..." section, para. 1*
+
+*   **Parameter:** The Manufacturer Disclosure Statement for Medical Device Security was updated in October 2019 to include an SBOM section supporting controls in the Roadmap for Third Party Components.
+    > *"Another tool that buyer/operators can leverage for communicating SBOM information is the Manufacturer Disclosure Statement for Medical Device Security, which was updated in October 2019 to include a new SBOM section that 'supports controls in the Roadmap for Third Party Components in the Device Life Cycle(RDMP) section'"*  
+    > 📍 *Location: "IMPLEMENTING A SOFTWARE BILL OF MATERIALS" section*
+
+*   **Parameter:** FDA draft premarket cybersecurity guidance (October 2018) states that leveraging an SBOM may support compliance with federal purchasing controls (21 CFR 820.50).
+    > *"In October 2018, FDA CDRH released its draft premarket cybersecurity guidance, which stated that leveraging an SBOM may support compliance with federal purchasing controls(21 CFR 820.50)"*  
+    > 📍 *Location: "GOVERNMENT AND SOFTWARE BILL OF MATERIALS" section*
+
+---
+
+## 4. Limitations and Future Directions
+
+*   **Limitation:** SBOMs are explicitly not presented as a comprehensive cybersecurity solution.
+    > *"While SBOMs are not a panacea for cybersecurity, they can be effective(i.e., timely) for cybersecurity risk management"*  
+    > 📍 *Location: Introduction, para. 4*
+
+*   **Limitation:** Implementation of SBOMs in healthcare has been slow, with limited peer-reviewed evidence available.
+    > *"Although mounting security problems in healthcare and their root causes have clarified that SBOMs might solve several problems, implementation has been slow and there are few data available from the published peer-reviewed literature"*  
+    > 📍 *Location: "A HISTORY OF THE SOFTWARE BILL OF MATERIALS" section, final paragraph*
+
+*   **Limitation:** Lack of out-of-the-box solutions and industry-wide standards has led organizations to develop proprietary, non-interoperable approaches.
+    > *"Complicating this issue is a lack of out-of-the-box solutions and industry-wide standards, such that organizations have developed home-grown proprietary solutions to improve interoperability and security of their systems"*  
+    > 📍 *Location: "A HISTORY OF THE SOFTWARE BILL OF MATERIALS" section, final paragraph*
+
+*   **Future Direction:** The NTIA multi-stakeholder process is developing voluntary, industry-led guidance on standardized SBOM formats, use cases, and tools.
+    > *"The National Telecommunications and Information Administration(NTIA) multi-stakeholder process on software component transparency is developing industry-led voluntary guidance on standardized formats, use cases, and SBOM tools"*  
+    > 📍 *Location: "IMPLEMENTING A SOFTWARE BILL OF MATERIALS" section*
+
+*   **Future Direction:** International regulatory bodies (IMDRF, Health Canada, EU) have published guidance incorporating SBOM requirements for medical device security.
+    > *"Internationally, the International Medical Device Regulators Forum(IMDRF) has published a draft set of principles and practices for medical device security that includes SBOM, as do the Health Canada requirements for medical device security and EU guidance"*  
+    > 📍 *Location: "GOVERNMENT AND SOFTWARE BILL OF MATERIALS" section*
+
+---
+
+## ⚠️ Ambiguities and Contextual Notes
+
+*   **Attribution clarity:** Several statistics (e.g., WannaCry impact figures) are cited from external sources (National Audit Office, Reuters) rather than generated by the authors. These should be cited as secondary references in downstream work.
+    > *"Reprinted from NTIA Use Cases and State of Practice Working Group"* (figure captions throughout)  
+    > 📍 *Location: Figure captions, pp. 2–4*
+
+*   **Article type clarification:** This is a Perspective article synthesizing policy analysis, case studies, and stakeholder interviews rather than reporting original empirical research. Claims should be contextualized accordingly.
+    > *"PERSPECTIVE OPEN"* (article header)  
+    > 📍 *Location: Document header, p. 1*
